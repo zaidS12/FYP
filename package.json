@@ -1,0 +1,19 @@
+{
+  "name": "agentflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AgentFlow - multi-tenant no-code AI agent builder (HTML prototype stage)",
+  "license": "UNLICENSED",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node scripts/build-seed.js",
+    "test": "node --test \"tests/unit/*.test.js\"",
+    "test:coverage": "node --test --experimental-test-coverage \"tests/unit/*.test.js\"",
+    "test:e2e": "playwright test",
+    "shots": "node scripts/screenshots.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1"
+  }
+}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create a free account · AgentFlow</title>
+  <meta name="description" content="Create a free individual AgentFlow account.">
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+  <script src="assets/js/theme-init.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="assets/css/theme.css">
+</head>
+<body data-root="" data-path="register.html">
+  <a class="skip-link" href="#name">Skip to the sign-up form</a>
+  <div class="auth">
+    <main class="auth-form">
+      <a class="brand" href="index.html"><img src="assets/img/logo.svg" alt="" width="28" height="28">AgentFlow</a>
+      <h1>Create a free account</h1>
+      <p class="lead">Free plan: 100 credits a month and personal flows. Company accounts are created by your company admin.</p>
+      <form id="register-form" novalidate>
+        <div id="register-error" class="alert" role="alert" hidden></div>
+        <div class="field">
+          <label class="label" for="name">Your name</label>
+          <input class="input" id="name" name="name" type="text" autocomplete="name" maxlength="80" aria-describedby="name-error" required>
+          <div class="field-error" id="name-error"></div>
+        </div>
+        <div class="field">
+          <label class="label" for="email">Email</label>
+          <input class="input" id="email" name="email" type="email" autocomplete="email" inputmode="email" aria-describedby="email-error" required>
+          <div class="field-error" id="email-error"></div>
+        </div>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <input class="input" id="password" name="password" type="password" autocomplete="new-password" aria-describedby="password-hint password-error" required>
+          <div class="hint" id="password-hint">At least 8 characters, with a letter and a number.</div>
+          <div class="field-error" id="password-error"></div>
+        </div>
+        <button id="register-submit" class="btn btn-primary btn-block" type="submit">Create free account</button>
+      </form>
+      <p class="auth-alt">Already have an account? <a href="index.html">Sign in</a></p>
+    </main>
+    <aside class="auth-art" aria-hidden="true">
+      <div class="stage">
+        <svg class="wires" viewBox="0 0 640 440" width="640" height="440" focusable="false">
+          <path class="wire" d="M190 52 C 215 52, 190 192, 216 192"/>
+          <path class="wire" d="M415 192 C 440 192, 415 332, 441 332"/>
+          <path class="wire-pulse" d="M190 52 C 215 52, 190 192, 216 192"/>
+          <path class="wire-pulse" d="M415 192 C 440 192, 415 332, 441 332"/>
+        </svg>
+        <div class="node node-a"><i class="punch"></i><i class="pin out"></i><span class="kind">Trigger</span><span class="title">Start</span><span class="meta">Runs when you press Run</span></div>
+        <div class="node node-b"><i class="punch"></i><i class="pin in"></i><i class="pin out"></i><span class="kind">AI</span><span class="title">Summarize</span><span class="meta">Bullets, up to 120 words</span></div>
+        <div class="node node-c"><i class="punch"></i><i class="pin in"></i><span class="kind">Output</span><span class="title">Create report</span><span class="meta">Markdown, 3 sections</span></div>
+      </div>
+      <div class="art-caption">
+        <h2>Your first flow in minutes.</h2>
+        <p>Describe the job in a sentence and AgentFlow lays out the cards for you to edit.</p>
+      </div>
+    </aside>
+  </div>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/tenancy.js"></script>
+  <script src="assets/js/fallback-seed.js"></script>
+  <script src="assets/js/db.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/pages/register.js"></script>
+</body>
+</html>

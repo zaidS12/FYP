@@ -1,0 +1,8 @@
+﻿node_modules/
+.env
+data/backups/
+data/db.json
+data/*.tmp
+coverage/
+test-results/
+playwright-report/

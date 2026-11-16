@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · AgentFlow</title>
+  <meta name="description" content="Sign in to AgentFlow, the no-code AI agent builder.">
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+  <script src="assets/js/theme-init.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="assets/css/theme.css">
+</head>
+<body data-root="" data-path="index.html">
+  <a class="skip-link" href="#email">Skip to the sign-in form</a>
+  <div class="auth">
+    <main class="auth-form">
+      <a class="brand" href="index.html"><img src="assets/img/logo.svg" alt="" width="28" height="28">AgentFlow</a>
+      <h1>Sign in</h1>
+      <p class="lead">Pick up where your flows left off.</p>
+      <form id="login-form" novalidate>
+        <div id="login-error" class="alert" role="alert" hidden></div>
+        <div class="field">
+          <label class="label" for="email">Email</label>
+          <input class="input" id="email" name="email" type="email" autocomplete="username" inputmode="email" required>
+        </div>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button id="login-submit" class="btn btn-primary btn-block" type="submit">Sign in</button>
+      </form>
+      <p class="auth-alt">No company account? <a href="register.html">Create a free individual account</a></p>
+      <details class="demo">
+        <summary>Try a demo account</summary>
+        <ul id="demo-list"></ul>
+        <p>Demo password for every account: <code>AgentFlow#2026</code>. This panel is removed before launch.</p>
+      </details>
+      <p id="mode-note" class="mode-note" role="status">Checking for the AgentFlow server…</p>
+    </main>
+    <aside class="auth-art" aria-hidden="true">
+      <div class="stage">
+        <svg class="wires" viewBox="0 0 640 440" width="640" height="440" focusable="false">
+          <path class="wire" d="M190 52 C 215 52, 190 192, 216 192"/>
+          <path class="wire" d="M415 192 C 440 192, 415 332, 441 332"/>
+          <path class="wire-pulse" d="M190 52 C 215 52, 190 192, 216 192"/>
+          <path class="wire-pulse" d="M415 192 C 440 192, 415 332, 441 332"/>
+        </svg>
+        <div class="node node-a"><i class="punch"></i><i class="pin out"></i><span class="kind">Trigger</span><span class="title">Every morning, 8:00</span><span class="meta">Timer / Cron</span></div>
+        <div class="node node-b"><i class="punch"></i><i class="pin in"></i><i class="pin out"></i><span class="kind">Data</span><span class="title">Search the web</span><span class="meta">“latest AI news”, top 5</span></div>
+        <div class="node node-c"><i class="punch"></i><i class="pin in"></i><span class="kind">Output</span><span class="title">Email me a summary</span><span class="meta">to team@company.com</span></div>
+      </div>
+      <div class="art-caption">
+        <h2>Build it like a flowchart.</h2>
+        <p>Drag cards, connect them, press Run. Your whole team edits the same flow together.</p>
+      </div>
+    </aside>
+  </div>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/tenancy.js"></script>
+  <script src="assets/js/fallback-seed.js"></script>
+  <script src="assets/js/db.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/pages/login.js"></script>
+</body>
+</html>
