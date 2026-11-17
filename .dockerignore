@@ -1,0 +1,10 @@
+node_modules
+.git
+test-results
+playwright-report
+coverage
+data/db.json
+data/backups
+design-reference
+docs/screenshots
+tests
