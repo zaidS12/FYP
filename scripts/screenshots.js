@@ -36,13 +36,13 @@ const OUT = path.join(ROOT, 'docs', 'screenshots');
       await page.fill('#email', 'ana@brightloom.test');
       await page.fill('#password', 'AgentFlow#2026');
       await Promise.all([page.waitForURL('**/app/flows.html'), page.click('#login-submit')]);
-      await page.waitForSelector('#flows-host table');
+      await page.waitForSelector('#host table');
       // The user's saved preference (light) wins after sign-in, so switch with the real toggle and check it sticks.
       if (theme === 'dark') {
         await page.click('button[aria-label="Switch to dark mode"]');
         await page.waitForFunction(() => document.documentElement.getAttribute('data-theme') === 'dark');
         await page.reload();
-        await page.waitForSelector('#flows-host table');
+        await page.waitForSelector('#host table');
         if (await page.evaluate(() => document.documentElement.getAttribute('data-theme')) !== 'dark') throw new Error('Dark theme did not persist per user after reload');
       }
       await shot('shell-employee');
@@ -52,6 +52,53 @@ const OUT = path.join(ROOT, 'docs', 'screenshots');
         await page.waitForTimeout(150);
         await shot('shell-mobile');
       }
+
+      // The screen that matters most: the builder canvas with a sample flow, one card selected so its settings show.
+      await page.setViewportSize({ width: 1700, height: 950 });
+      await page.goto(base + '/app/builder.html?id=f_report');
+      await page.waitForSelector('.cv-node');
+      await page.evaluate(t => AF.ui.applyTheme(t), theme);
+      await page.locator('.cv-node').filter({ has: page.locator('.title', { hasText: /^Build report$/ }) }).click();
+      await page.waitForTimeout(250);
+      await shot('builder-canvas');
+
+      if (theme === 'light') {
+        // Validation shown on the cards themselves: a flow with problems.
+        const made = await page.evaluate(async () => {
+          const nodes = [
+            { id: 'n1', type: 'start', label: 'Start', x: 80, y: 200, config: {} },
+            { id: 'n2', type: 'search_web', label: 'Find news', x: 380, y: 200, config: { query: '' } },
+            { id: 'n3', type: 'write_email', label: 'Email me', x: 680, y: 200, config: { to: 'not-an-email', subject: '' } },
+            { id: 'n4', type: 'translate', label: 'Translate', x: 380, y: 380, config: { target_language: 'Urdu' } },
+          ];
+          const edges = [{ id: 'e1', from: 'n1', fromPort: 'out', to: 'n2', toPort: 'in' }, { id: 'e2', from: 'n2', fromPort: 'out', to: 'n3', toPort: 'in' }];
+          const res = await fetch('/api/flows', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Flow with problems', nodes, edges }) });
+          return (await res.json()).flow.id;
+        });
+        await page.goto(base + '/app/builder.html?id=' + made);
+        await page.waitForSelector('.cv-node');
+        await page.evaluate(t => AF.ui.applyTheme(t), theme);
+        await page.waitForTimeout(250);
+        await shot('builder-problems');
+      }
+      if (theme === 'light') {
+        // A finished run (live in the builder) and a failed run (details in history).
+        await page.goto(base + '/app/builder.html?id=f_news');
+        await page.waitForSelector('.cv-node');
+        await page.getByRole('button', { name: 'Run this flow' }).click();
+        await page.waitForSelector('.run-head');
+        await page.getByRole('button', { name: 'Run this flow' }).waitFor({ timeout: 25000 });
+        await page.waitForTimeout(500);
+        await shot('builder-run-finished');
+        await page.goto(base + '/app/runs.html');
+        await page.waitForSelector('table');
+        await shot('runs-history');
+        await page.locator('tr', { hasText: 'Failed' }).getByRole('button', { name: /^Details of the run of/ }).first().click();
+        await page.waitForSelector('[role="dialog"]');
+        await page.waitForTimeout(250);
+        await shot('run-details');
+      }
+      await page.setViewportSize({ width: 1440, height: 900 });
       await ctx.close();
     }
   } finally {

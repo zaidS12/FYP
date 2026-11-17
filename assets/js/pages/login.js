@@ -19,7 +19,7 @@
     const n = new URLSearchParams(location.search).get('next');
     return n && /^(app|admin|super)\/[a-z-]+\.html$/.test(n) ? n : null;
   }
-  function go(user) { location.href = nextTarget() || AF.auth.homeFor(user.role, AF.ui.BUILT); }
+  function go(user) { location.href = nextTarget() || AF.auth.homeFor(user.role); }
 
   const existing = await AF.db.me();
   if (existing.ok) { go(existing.user); return; }

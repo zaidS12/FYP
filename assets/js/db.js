@@ -95,7 +95,7 @@
         const { name, email, password } = v.value;
         if (data.users.some(u => u.email === email)) return fail(409, 'An account with this email already exists. Sign in instead.', { errors: { email: 'This email is already registered.' } });
         const now = new Date().toISOString();
-        const user = { id: rid('u'), tenant_id: null, role: 'individual', name, email, password_hash: await hashPw(subtle, password), status: 'active', prefs: { theme: 'light' }, created_at: now, created_by: null };
+        const user = { id: rid('u'), tenant_id: null, role: 'individual', plan_id: 'free', name, email, password_hash: await hashPw(subtle, password), status: 'active', prefs: { theme: 'light' }, created_at: now, created_by: null };
         const free = data.plans.find(p => p.id === 'free');
         data.users.push(user);
         data.usage.push({ id: 'use_' + user.id, tenant_id: null, user_id: user.id, period: now.slice(0, 7), credits_used: 0, credits_limit: free ? free.credits_per_month : 100 });
@@ -139,6 +139,7 @@
     }
     return {
       mode: 'server',
+      request: req,
       login: b => req('POST', '/api/auth/login', b),
       register: b => req('POST', '/api/auth/register', b),
       logout: () => req('POST', '/api/auth/logout', {}),
@@ -148,7 +149,45 @@
     };
   }
 
-  const db = { mode: null, _b: null, createLocalBackend, createHttpBackend };
+  /** Every server feature beyond sign-in: [method, path template, kind]. kind: 'body' sends JSON, 'query' adds ?a=b. */
+  const ENDPOINTS = {
+    listUsers: ['GET', '/api/users', 'query'], createUser: ['POST', '/api/users', 'body'], updateUser: ['PATCH', '/api/users/:id', 'body'],
+    deleteUser: ['DELETE', '/api/users/:id', 'query'], resetPassword: ['POST', '/api/users/:id/reset-password', 'body'],
+    freezeUser: ['POST', '/api/users/:id/freeze', 'body'], unfreezeUser: ['POST', '/api/users/:id/unfreeze', 'body'],
+    listDevices: ['GET', '/api/devices', 'query'], listLoginEvents: ['GET', '/api/login-events', 'query'], getSeats: ['GET', '/api/seats', 'query'],
+    listTenants: ['GET', '/api/tenants', 'query'], createTenant: ['POST', '/api/tenants', 'body'], getTenant: ['GET', '/api/tenants/:id', 'query'],
+    updateTenant: ['PATCH', '/api/tenants/:id', 'body'], deleteTenant: ['DELETE', '/api/tenants/:id', 'query'],
+    freezeTenant: ['POST', '/api/tenants/:id/freeze', 'body'], unfreezeTenant: ['POST', '/api/tenants/:id/unfreeze', 'body'],
+    platformStats: ['GET', '/api/stats/platform', 'query'], listInvoices: ['GET', '/api/invoices', 'query'], listPayments: ['GET', '/api/payments', 'query'],
+    listAudit: ['GET', '/api/audit', 'query'], exportDb: ['GET', '/api/db/export', 'query'], exportCompany: ['GET', '/api/db/export-company', 'query'],
+    importDb: ['POST', '/api/db/import', 'body'], importCompany: ['POST', '/api/db/import-company', 'body'],
+    companyStats: ['GET', '/api/stats/company', 'query'], getBilling: ['GET', '/api/billing', 'query'], buySeats: ['POST', '/api/billing/seats', 'body'],
+    changePlan: ['POST', '/api/billing/plan', 'body'], payInvoice: ['POST', '/api/billing/invoices/:id/pay', 'body'],
+    getFlow: ['GET', '/api/flows/:id', 'query'], createFlow: ['POST', '/api/flows', 'body'], saveFlow: ['PATCH', '/api/flows/:id', 'body'],
+    deleteFlow: ['DELETE', '/api/flows/:id', 'query'], duplicateFlow: ['POST', '/api/flows/:id/duplicate', 'body'],
+    listTemplates: ['GET', '/api/templates', 'query'], cloneTemplate: ['POST', '/api/templates/:id/clone', 'body'], getUsage: ['GET', '/api/usage', 'query'],
+    getAccount: ['GET', '/api/account', 'query'], updateProfile: ['PATCH', '/api/account/profile', 'body'], changePassword: ['POST', '/api/account/password', 'body'],
+    startRun: ['POST', '/api/flows/:id/runs', 'body'], listRuns: ['GET', '/api/runs', 'query'], getRun: ['GET', '/api/runs/:id', 'query'], stopRun: ['POST', '/api/runs/:id/stop', 'body'],
+    listVersions: ['GET', '/api/flows/:id/versions', 'query'], getVersion: ['GET', '/api/flows/:id/versions/:n', 'query'], restoreVersion: ['POST', '/api/flows/:id/versions/:n/restore', 'body'],
+    startImpersonation: ['POST', '/api/impersonation/start', 'body'], endImpersonation: ['POST', '/api/impersonation/end', 'body'],
+    myActivity: ['GET', '/api/account/activity', 'query'], saveCustomCards: ['PUT', '/api/account/cards', 'body'], changePersonalPlan: ['POST', '/api/account/plan', 'body'],
+  };
+  const NEEDS_SERVER = 'This feature needs the AgentFlow server. Start it with "node server.js" (or "PORT=3200 node server.js" if port 3000 is busy) and open the address it prints. Pages opened from VS Code Live Preview or by double-clicking the file have no server behind them.';
+
+  const db = { mode: null, _b: null, createLocalBackend, createHttpBackend, ENDPOINTS };
+  Object.entries(ENDPOINTS).forEach(([name, [method, template, kind]]) => {
+    db[name] = (...args) => {
+      if (!db._b) return Promise.resolve(fail(0, 'Data layer is not ready. Call AF.db.init() first.'));
+      if (db._b.mode !== 'server') return Promise.resolve(fail(501, NEEDS_SERVER));
+      const path = template.replace(/:[a-z]+/g, () => encodeURIComponent(String(args.shift())));
+      const extra = args[0];
+      if (kind === 'query') {
+        const qs = extra && typeof extra === 'object' ? new URLSearchParams(Object.entries(extra).filter(([, v]) => v !== undefined && v !== null && v !== '')).toString() : '';
+        return db._b.request(method, path + (qs ? '?' + qs : ''));
+      }
+      return db._b.request(method, path, extra === undefined ? {} : extra);
+    };
+  });
   ['login', 'register', 'logout', 'me', 'setPrefs', 'listFlows'].forEach(name => {
     db[name] = (...args) => {
       if (!db._b) return Promise.resolve(fail(0, 'Data layer is not ready. Call AF.db.init() first.'));

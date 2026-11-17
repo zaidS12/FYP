@@ -25,6 +25,17 @@ function verifyPassword(password, stored) {
   }
 }
 
+/** 12-char temporary password: unambiguous letters and digits, always at least one of each. */
+function randomPassword() {
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  const all = letters + '23456789';
+  for (;;) {
+    let p = '';
+    for (let i = 0; i < 12; i++) p += all[crypto.randomInt(all.length)];
+    if (/[A-Za-z]/.test(p) && /\d/.test(p)) return p;
+  }
+}
+
 const newToken = () => crypto.randomBytes(32).toString('base64url');
 const hashToken = t => crypto.createHash('sha256').update(String(t)).digest('hex');
 const newId = prefix => prefix + '_' + crypto.randomBytes(8).toString('hex');
@@ -76,4 +87,4 @@ function serializeCookie(name, value, { maxAgeSec, secure } = {}) {
   return c;
 }
 
-module.exports = { hashPassword, verifyPassword, newToken, hashToken, newId, RateLimiter, parseCookies, serializeCookie };
+module.exports = { hashPassword, verifyPassword, randomPassword, newToken, hashToken, newId, RateLimiter, parseCookies, serializeCookie };

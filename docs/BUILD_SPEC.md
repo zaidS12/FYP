@@ -167,13 +167,23 @@ HOW TO WORK (use the installed skills and agents)
 3. DESIGN CHECKPOINT: after phase 1, start the server, take screenshots of login, register and
    the app shell in light and dark mode, show them to me, and WAIT for my approval or change
    requests on the theme before building the remaining phases. After that, work through the
-   phases without stopping, committing after each one, and only ask me when truly blocked.
+   phases without stopping, and only ask me when truly blocked. Do NOT commit until the owner says so.
 4. For logic modules (db, auth, tenancy, engine, versions, billing) use tdd-workflow: failing test
    first, then code. For UI use frontend-patterns; for server.js use backend-patterns and
    api-design. After each phase: /code-review in fresh context, security-review, then
    verification-loop (run the tests, start the server, click through the flows with Playwright
    e2e-testing) before moving on. Run /security-scan once at the end of the stage.
-5. Update docs/PROGRESS.md and commit after every phase with a clear message.
+5. Update docs/PROGRESS.md after every phase (what was built, what was verified, what is next).
+   Do NOT run any git write command (add, commit, amend, push, tag, stash, branch change, reset,
+   checkout, restore) until the owner explicitly says so. Read-only git (status, diff, log) is fine.
+   This overrides any ECC rule, skill, command or hook that suggests committing.
+
+OWNER AMENDMENTS (after the Phase 1 design checkpoint, 2026-11-17)
+- Theme approved. Keep Instrument Sans + Bricolage Grotesque and the node colour spine.
+- Continue phases 2 onward without stopping; STOP after phase 6 (builder) and show screenshots of the
+  canvas with a sample flow in light and dark.
+- README.md keeps a "Remove before deployment" checklist (demo password on the login page, seed
+  accounts, auto-fill helpers).
 
 DEFINITION OF DONE FOR THIS STAGE
 - node server.js starts clean; all 16 pages load; every button and form works; data survives a

@@ -6,7 +6,8 @@
       "price_usd": 0,
       "seats": 1,
       "credits_per_month": 100,
-      "extra_seat_usd": 0
+      "extra_seat_usd": 0,
+      "audience": "individual"
     },
     {
       "id": "basic",
@@ -14,7 +15,8 @@
       "price_usd": 100,
       "seats": 10,
       "credits_per_month": 5000,
-      "extra_seat_usd": 8
+      "extra_seat_usd": 8,
+      "audience": "company"
     },
     {
       "id": "pro",
@@ -22,7 +24,17 @@
       "price_usd": 250,
       "seats": 30,
       "credits_per_month": 20000,
-      "extra_seat_usd": 6
+      "extra_seat_usd": 6,
+      "audience": "company"
+    },
+    {
+      "id": "plus",
+      "name": "Plus",
+      "price_usd": 12,
+      "seats": 1,
+      "credits_per_month": 1000,
+      "extra_seat_usd": 0,
+      "audience": "individual"
     }
   ],
   "tenants": [
@@ -33,7 +45,7 @@
       "status": "active",
       "frozen_reason": null,
       "extra_seats": 0,
-      "created_at": "2026-08-18T22:06:20.577Z"
+      "created_at": "2026-08-18T23:03:11.851Z"
     },
     {
       "id": "t_kestrel",
@@ -42,7 +54,7 @@
       "status": "frozen",
       "frozen_reason": "Invoice INV-2026-0007 unpaid",
       "extra_seats": 0,
-      "created_at": "2026-09-17T22:06:20.577Z"
+      "created_at": "2026-09-17T23:03:11.851Z"
     }
   ],
   "users": [
@@ -52,12 +64,12 @@
       "role": "superadmin",
       "name": "Platform Admin",
       "email": "super@agentflow.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-07-19T22:06:20.577Z",
+      "created_at": "2026-07-19T23:03:11.851Z",
       "created_by": null
     },
     {
@@ -66,12 +78,12 @@
       "role": "admin",
       "name": "Maya Hussain",
       "email": "admin@brightloom.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-08-18T22:06:20.577Z",
+      "created_at": "2026-08-18T23:03:11.851Z",
       "created_by": null
     },
     {
@@ -80,12 +92,12 @@
       "role": "employee",
       "name": "Ana Torres",
       "email": "ana@brightloom.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-08-28T22:06:20.577Z",
+      "created_at": "2026-08-28T23:03:11.851Z",
       "created_by": "u_bl_admin"
     },
     {
@@ -94,12 +106,12 @@
       "role": "employee",
       "name": "Omar Siddiqui",
       "email": "omar@brightloom.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-09-07T22:06:20.577Z",
+      "created_at": "2026-09-07T23:03:11.851Z",
       "created_by": "u_bl_admin"
     },
     {
@@ -108,12 +120,12 @@
       "role": "employee",
       "name": "Lina Park",
       "email": "lina@brightloom.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-09-22T22:06:20.577Z",
+      "created_at": "2026-09-22T23:03:11.851Z",
       "created_by": "u_bl_admin"
     },
     {
@@ -122,12 +134,12 @@
       "role": "employee",
       "name": "Raj Menon",
       "email": "raj@brightloom.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-10-07T22:06:20.577Z",
+      "created_at": "2026-10-07T23:03:11.851Z",
       "created_by": "u_bl_admin"
     },
     {
@@ -136,12 +148,12 @@
       "role": "employee",
       "name": "Devon Clarke",
       "email": "dev.frozen@brightloom.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "frozen",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-10-12T22:06:20.577Z",
+      "created_at": "2026-10-12T23:03:11.851Z",
       "created_by": "u_bl_admin"
     },
     {
@@ -150,12 +162,12 @@
       "role": "admin",
       "name": "Idris Kestrel",
       "email": "admin@kestrel.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-09-17T22:06:20.577Z",
+      "created_at": "2026-09-17T23:03:11.851Z",
       "created_by": null
     },
     {
@@ -164,12 +176,12 @@
       "role": "employee",
       "name": "Sam Okafor",
       "email": "sam@kestrel.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-09-27T22:06:20.577Z",
+      "created_at": "2026-09-27T23:03:11.851Z",
       "created_by": "u_ke_admin"
     },
     {
@@ -178,12 +190,12 @@
       "role": "employee",
       "name": "Noor Fatima",
       "email": "noor@kestrel.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-10-02T22:06:20.577Z",
+      "created_at": "2026-10-02T23:03:11.851Z",
       "created_by": "u_ke_admin"
     },
     {
@@ -192,13 +204,14 @@
       "role": "individual",
       "name": "Sol Individual",
       "email": "solo@example.test",
-      "password_hash": "scrypt$16384$8$1$CBoXrx0vMgJmjzbs24yuDQ==$5ltTKy5qNue32du4GEAYVu8g2Ej4itg9qwSzymCQXnX7HnMWLBrWvcmcEdwTF2rTRpqFTmxr0ZlsXtf7RQewkg==",
+      "password_hash": "scrypt$16384$8$1$4ITCIY3LjmQNje81K+pHbg==$IFehhrwxWuDpSHszwGw0/J/1+ORDv3r+CqtfRxdzvKi7kTzMUVTdssB7Qketzc1C0nHuFvoU2ZFO4hTS+5v5Gg==",
       "status": "active",
       "prefs": {
         "theme": "light"
       },
-      "created_at": "2026-10-27T22:06:20.577Z",
-      "created_by": null
+      "created_at": "2026-10-27T23:03:11.851Z",
+      "created_by": null,
+      "plan_id": "free"
     }
   ],
   "sessions": [],
@@ -210,8 +223,8 @@
       "browser": "Chrome 126",
       "os": "Windows",
       "device": "Desktop",
-      "first_seen": "2026-11-11T22:06:20.577Z",
-      "last_seen": "2026-11-15T22:06:20.577Z",
+      "first_seen": "2026-11-11T23:03:11.851Z",
+      "last_seen": "2026-11-15T23:03:11.851Z",
       "login_count": 2
     },
     {
@@ -221,8 +234,8 @@
       "browser": "Edge 126",
       "os": "Windows",
       "device": "Desktop",
-      "first_seen": "2026-11-13T22:06:20.577Z",
-      "last_seen": "2026-11-13T22:06:20.577Z",
+      "first_seen": "2026-11-13T23:03:11.851Z",
+      "last_seen": "2026-11-13T23:03:11.851Z",
       "login_count": 1
     },
     {
@@ -232,8 +245,8 @@
       "browser": "Safari 17",
       "os": "iOS",
       "device": "Mobile",
-      "first_seen": "2026-11-16T12:06:20.577Z",
-      "last_seen": "2026-11-16T12:06:20.577Z",
+      "first_seen": "2026-11-16T13:03:11.851Z",
+      "last_seen": "2026-11-16T13:03:11.851Z",
       "login_count": 1
     },
     {
@@ -243,8 +256,8 @@
       "browser": "Chrome 126",
       "os": "Windows",
       "device": "Desktop",
-      "first_seen": "2026-11-14T22:06:20.577Z",
-      "last_seen": "2026-11-16T20:06:20.577Z",
+      "first_seen": "2026-11-14T23:03:11.851Z",
+      "last_seen": "2026-11-16T21:03:11.851Z",
       "login_count": 2
     },
     {
@@ -254,8 +267,8 @@
       "browser": "Firefox 127",
       "os": "Linux",
       "device": "Desktop",
-      "first_seen": "2026-11-16T17:06:20.577Z",
-      "last_seen": "2026-11-16T17:06:20.577Z",
+      "first_seen": "2026-11-16T18:03:11.851Z",
+      "last_seen": "2026-11-16T18:03:11.851Z",
       "login_count": 1
     },
     {
@@ -265,8 +278,8 @@
       "browser": "Safari 17",
       "os": "macOS",
       "device": "Desktop",
-      "first_seen": "2026-11-14T22:06:20.577Z",
-      "last_seen": "2026-11-14T22:06:20.577Z",
+      "first_seen": "2026-11-14T23:03:11.851Z",
+      "last_seen": "2026-11-14T23:03:11.851Z",
       "login_count": 1
     },
     {
@@ -276,8 +289,8 @@
       "browser": "Chrome 126",
       "os": "Android",
       "device": "Mobile",
-      "first_seen": "2026-11-12T22:06:20.577Z",
-      "last_seen": "2026-11-12T22:06:20.577Z",
+      "first_seen": "2026-11-12T23:03:11.851Z",
+      "last_seen": "2026-11-12T23:03:11.851Z",
       "login_count": 1
     },
     {
@@ -287,8 +300,8 @@
       "browser": "Edge 126",
       "os": "Windows",
       "device": "Desktop",
-      "first_seen": "2026-11-15T22:11:20.577Z",
-      "last_seen": "2026-11-15T22:11:20.577Z",
+      "first_seen": "2026-11-15T23:08:11.851Z",
+      "last_seen": "2026-11-15T23:08:11.851Z",
       "login_count": 1
     },
     {
@@ -298,8 +311,8 @@
       "browser": "Chrome 126",
       "os": "Windows",
       "device": "Desktop",
-      "first_seen": "2026-11-07T22:06:20.577Z",
-      "last_seen": "2026-11-07T22:06:20.577Z",
+      "first_seen": "2026-11-07T23:03:11.851Z",
+      "last_seen": "2026-11-07T23:03:11.851Z",
       "login_count": 1
     },
     {
@@ -309,8 +322,8 @@
       "browser": "Firefox 127",
       "os": "Linux",
       "device": "Desktop",
-      "first_seen": "2026-11-08T22:06:20.577Z",
-      "last_seen": "2026-11-08T22:06:20.577Z",
+      "first_seen": "2026-11-08T23:03:11.851Z",
+      "last_seen": "2026-11-08T23:03:11.851Z",
       "login_count": 1
     },
     {
@@ -320,8 +333,8 @@
       "browser": "Safari 17",
       "os": "iOS",
       "device": "Mobile",
-      "first_seen": "2026-11-14T22:06:20.577Z",
-      "last_seen": "2026-11-14T22:06:20.577Z",
+      "first_seen": "2026-11-14T23:03:11.851Z",
+      "last_seen": "2026-11-14T23:03:11.851Z",
       "login_count": 1
     },
     {
@@ -331,8 +344,8 @@
       "browser": "Chrome 126",
       "os": "Windows",
       "device": "Desktop",
-      "first_seen": "2026-11-16T15:26:20.577Z",
-      "last_seen": "2026-11-16T15:26:20.577Z",
+      "first_seen": "2026-11-16T16:23:11.851Z",
+      "last_seen": "2026-11-16T16:23:11.851Z",
       "login_count": 1
     }
   ],
@@ -341,7 +354,7 @@
       "id": "le_1",
       "user_id": "u_super",
       "tenant_id": null,
-      "at": "2026-11-11T22:06:20.577Z",
+      "at": "2026-11-11T23:03:11.851Z",
       "ip": "203.0.113.10",
       "browser": "Chrome 126",
       "os": "Windows",
@@ -353,7 +366,7 @@
       "id": "le_2",
       "user_id": "u_super",
       "tenant_id": null,
-      "at": "2026-11-15T22:06:20.577Z",
+      "at": "2026-11-15T23:03:11.851Z",
       "ip": "203.0.113.10",
       "browser": "Chrome 126",
       "os": "Windows",
@@ -365,7 +378,7 @@
       "id": "le_3",
       "user_id": "u_bl_admin",
       "tenant_id": "t_brightloom",
-      "at": "2026-11-13T22:06:20.577Z",
+      "at": "2026-11-13T23:03:11.851Z",
       "ip": "198.51.100.21",
       "browser": "Edge 126",
       "os": "Windows",
@@ -377,7 +390,7 @@
       "id": "le_4",
       "user_id": "u_bl_admin",
       "tenant_id": "t_brightloom",
-      "at": "2026-11-16T12:06:20.577Z",
+      "at": "2026-11-16T13:03:11.851Z",
       "ip": "198.51.100.58",
       "browser": "Safari 17",
       "os": "iOS",
@@ -389,7 +402,7 @@
       "id": "le_5",
       "user_id": "u_bl_ana",
       "tenant_id": "t_brightloom",
-      "at": "2026-11-14T22:06:20.577Z",
+      "at": "2026-11-14T23:03:11.851Z",
       "ip": "198.51.100.22",
       "browser": "Chrome 126",
       "os": "Windows",
@@ -401,7 +414,7 @@
       "id": "le_6",
       "user_id": "u_bl_ana",
       "tenant_id": "t_brightloom",
-      "at": "2026-11-16T17:06:20.577Z",
+      "at": "2026-11-16T18:03:11.851Z",
       "ip": "198.51.100.22",
       "browser": "Firefox 127",
       "os": "Linux",
@@ -413,7 +426,7 @@
       "id": "le_7",
       "user_id": "u_bl_ana",
       "tenant_id": "t_brightloom",
-      "at": "2026-11-16T20:06:20.577Z",
+      "at": "2026-11-16T21:03:11.851Z",
       "ip": "198.51.100.22",
       "browser": "Chrome 126",
       "os": "Windows",
@@ -425,7 +438,7 @@
       "id": "le_8",
       "user_id": "u_bl_omar",
       "tenant_id": "t_brightloom",
-      "at": "2026-11-14T22:06:20.577Z",
+      "at": "2026-11-14T23:03:11.851Z",
       "ip": "198.51.100.23",
       "browser": "Safari 17",
       "os": "macOS",
@@ -437,7 +450,7 @@
       "id": "le_9",
       "user_id": "u_bl_omar",
       "tenant_id": "t_brightloom",
-      "at": "2026-11-12T22:06:20.577Z",
+      "at": "2026-11-12T23:03:11.851Z",
       "ip": "198.51.100.77",
       "browser": "Chrome 126",
       "os": "Android",
@@ -449,7 +462,7 @@
       "id": "le_10",
       "user_id": "u_bl_lina",
       "tenant_id": "t_brightloom",
-      "at": "2026-11-15T22:06:20.577Z",
+      "at": "2026-11-15T23:03:11.851Z",
       "ip": "198.51.100.24",
       "browser": "Edge 126",
       "os": "Windows",
@@ -461,7 +474,7 @@
       "id": "le_11",
       "user_id": "u_bl_lina",
       "tenant_id": "t_brightloom",
-      "at": "2026-11-15T22:11:20.577Z",
+      "at": "2026-11-15T23:08:11.851Z",
       "ip": "198.51.100.24",
       "browser": "Edge 126",
       "os": "Windows",
@@ -473,7 +486,7 @@
       "id": "le_12",
       "user_id": "u_ke_admin",
       "tenant_id": "t_kestrel",
-      "at": "2026-11-07T22:06:20.577Z",
+      "at": "2026-11-07T23:03:11.851Z",
       "ip": "192.0.2.31",
       "browser": "Chrome 126",
       "os": "Windows",
@@ -485,7 +498,7 @@
       "id": "le_13",
       "user_id": "u_ke_sam",
       "tenant_id": "t_kestrel",
-      "at": "2026-11-08T22:06:20.577Z",
+      "at": "2026-11-08T23:03:11.851Z",
       "ip": "192.0.2.32",
       "browser": "Firefox 127",
       "os": "Linux",
@@ -497,7 +510,7 @@
       "id": "le_14",
       "user_id": "u_solo",
       "tenant_id": null,
-      "at": "2026-11-14T22:06:20.577Z",
+      "at": "2026-11-14T23:03:11.851Z",
       "ip": "203.0.113.90",
       "browser": "Safari 17",
       "os": "iOS",
@@ -509,7 +522,7 @@
       "id": "le_15",
       "user_id": "u_solo",
       "tenant_id": null,
-      "at": "2026-11-16T15:26:20.577Z",
+      "at": "2026-11-16T16:23:11.851Z",
       "ip": "203.0.113.91",
       "browser": "Chrome 126",
       "os": "Windows",
@@ -524,8 +537,8 @@
       "tenant_id": "t_brightloom",
       "plan_id": "basic",
       "status": "active",
-      "period_start": "2026-11-04T22:06:20.577Z",
-      "period_end": "2026-12-04T22:06:20.577Z",
+      "period_start": "2026-11-04T23:03:11.851Z",
+      "period_end": "2026-12-04T23:03:11.851Z",
       "extra_seats": 0
     },
     {
@@ -533,8 +546,8 @@
       "tenant_id": "t_kestrel",
       "plan_id": "basic",
       "status": "suspended",
-      "period_start": "2026-11-04T22:06:20.577Z",
-      "period_end": "2026-12-04T22:06:20.577Z",
+      "period_start": "2026-11-04T23:03:11.851Z",
+      "period_end": "2026-12-04T23:03:11.851Z",
       "extra_seats": 0
     }
   ],
@@ -552,8 +565,8 @@
       ],
       "amount_usd": 100,
       "status": "paid",
-      "issued_at": "2026-08-23T22:06:20.577Z",
-      "paid_at": "2026-08-23T22:07:20.577Z"
+      "issued_at": "2026-08-23T23:03:11.851Z",
+      "paid_at": "2026-08-23T23:04:11.851Z"
     },
     {
       "id": "inv_t_brightloom_2",
@@ -568,8 +581,8 @@
       ],
       "amount_usd": 100,
       "status": "paid",
-      "issued_at": "2026-09-22T22:06:20.577Z",
-      "paid_at": "2026-09-22T22:07:20.577Z"
+      "issued_at": "2026-09-22T23:03:11.851Z",
+      "paid_at": "2026-09-22T23:04:11.851Z"
     },
     {
       "id": "inv_t_brightloom_3",
@@ -584,8 +597,8 @@
       ],
       "amount_usd": 100,
       "status": "paid",
-      "issued_at": "2026-10-22T22:06:20.577Z",
-      "paid_at": "2026-10-22T22:07:20.577Z"
+      "issued_at": "2026-10-22T23:03:11.851Z",
+      "paid_at": "2026-10-22T23:04:11.851Z"
     },
     {
       "id": "inv_t_kestrel_5",
@@ -600,8 +613,8 @@
       ],
       "amount_usd": 100,
       "status": "paid",
-      "issued_at": "2026-09-19T22:06:20.577Z",
-      "paid_at": "2026-09-19T22:07:20.577Z"
+      "issued_at": "2026-09-19T23:03:11.851Z",
+      "paid_at": "2026-09-19T23:04:11.851Z"
     },
     {
       "id": "inv_t_kestrel_6",
@@ -616,8 +629,8 @@
       ],
       "amount_usd": 100,
       "status": "paid",
-      "issued_at": "2026-10-19T22:06:20.577Z",
-      "paid_at": "2026-10-19T22:07:20.577Z"
+      "issued_at": "2026-10-19T23:03:11.851Z",
+      "paid_at": "2026-10-19T23:04:11.851Z"
     },
     {
       "id": "inv_t_kestrel_7",
@@ -632,7 +645,7 @@
       ],
       "amount_usd": 100,
       "status": "overdue",
-      "issued_at": "2026-11-10T22:06:20.577Z",
+      "issued_at": "2026-11-10T23:03:11.851Z",
       "paid_at": null
     }
   ],
@@ -644,7 +657,7 @@
       "amount_usd": 100,
       "method": "card •••• 4242",
       "status": "succeeded",
-      "created_at": "2026-08-23T22:07:20.577Z"
+      "created_at": "2026-08-23T23:04:11.851Z"
     },
     {
       "id": "pay_inv_t_brightloom_2",
@@ -653,7 +666,7 @@
       "amount_usd": 100,
       "method": "card •••• 4242",
       "status": "succeeded",
-      "created_at": "2026-09-22T22:07:20.577Z"
+      "created_at": "2026-09-22T23:04:11.851Z"
     },
     {
       "id": "pay_inv_t_brightloom_3",
@@ -662,7 +675,7 @@
       "amount_usd": 100,
       "method": "card •••• 4242",
       "status": "succeeded",
-      "created_at": "2026-10-22T22:07:20.577Z"
+      "created_at": "2026-10-22T23:04:11.851Z"
     },
     {
       "id": "pay_inv_t_kestrel_5",
@@ -671,7 +684,7 @@
       "amount_usd": 100,
       "method": "card •••• 4242",
       "status": "succeeded",
-      "created_at": "2026-09-19T22:07:20.577Z"
+      "created_at": "2026-09-19T23:04:11.851Z"
     },
     {
       "id": "pay_inv_t_kestrel_6",
@@ -680,7 +693,7 @@
       "amount_usd": 100,
       "method": "card •••• 4242",
       "status": "succeeded",
-      "created_at": "2026-10-19T22:07:20.577Z"
+      "created_at": "2026-10-19T23:04:11.851Z"
     }
   ],
   "flows": [
@@ -773,8 +786,8 @@
       ],
       "version": 2,
       "shared": true,
-      "created_at": "2026-10-11T22:06:20.577Z",
-      "updated_at": "2026-10-13T22:06:20.577Z"
+      "created_at": "2026-10-11T23:03:11.851Z",
+      "updated_at": "2026-10-13T23:03:11.851Z"
     },
     {
       "id": "f_report",
@@ -897,8 +910,8 @@
       ],
       "version": 2,
       "shared": true,
-      "created_at": "2026-10-15T22:06:20.577Z",
-      "updated_at": "2026-10-17T22:06:20.577Z"
+      "created_at": "2026-10-15T23:03:11.851Z",
+      "updated_at": "2026-10-17T23:03:11.851Z"
     },
     {
       "id": "f_translate",
@@ -951,8 +964,8 @@
       ],
       "version": 2,
       "shared": false,
-      "created_at": "2026-10-19T22:06:20.577Z",
-      "updated_at": "2026-10-21T22:06:20.577Z"
+      "created_at": "2026-10-19T23:03:11.851Z",
+      "updated_at": "2026-10-21T23:03:11.851Z"
     },
     {
       "id": "f_ke",
@@ -1024,8 +1037,8 @@
       ],
       "version": 2,
       "shared": true,
-      "created_at": "2026-10-23T22:06:20.577Z",
-      "updated_at": "2026-10-25T22:06:20.577Z"
+      "created_at": "2026-10-23T23:03:11.851Z",
+      "updated_at": "2026-10-25T23:03:11.851Z"
     },
     {
       "id": "f_solo",
@@ -1079,8 +1092,8 @@
       ],
       "version": 2,
       "shared": false,
-      "created_at": "2026-10-27T22:06:20.577Z",
-      "updated_at": "2026-10-29T22:06:20.577Z"
+      "created_at": "2026-10-27T23:03:11.851Z",
+      "updated_at": "2026-10-29T23:03:11.851Z"
     }
   ],
   "flowVersions": [
@@ -1091,7 +1104,7 @@
       "n": 1,
       "user_id": "u_bl_ana",
       "user_name": "Ana Torres",
-      "at": "2026-10-11T22:06:20.577Z",
+      "at": "2026-10-11T23:03:11.851Z",
       "summary": "Created flow",
       "snapshot": {
         "name": "Daily AI news digest",
@@ -1152,7 +1165,7 @@
       "n": 2,
       "user_id": "u_bl_ana",
       "user_name": "Ana Torres",
-      "at": "2026-10-13T22:06:20.577Z",
+      "at": "2026-10-13T23:03:11.851Z",
       "summary": "Added the remaining steps and connections",
       "snapshot": {
         "name": "Daily AI news digest",
@@ -1247,7 +1260,7 @@
       "n": 1,
       "user_id": "u_bl_omar",
       "user_name": "Omar Siddiqui",
-      "at": "2026-10-15T22:06:20.577Z",
+      "at": "2026-10-15T23:03:11.851Z",
       "summary": "Created flow",
       "snapshot": {
         "name": "Competitor research report",
@@ -1308,7 +1321,7 @@
       "n": 2,
       "user_id": "u_bl_omar",
       "user_name": "Omar Siddiqui",
-      "at": "2026-10-17T22:06:20.577Z",
+      "at": "2026-10-17T23:03:11.851Z",
       "summary": "Added the remaining steps and connections",
       "snapshot": {
         "name": "Competitor research report",
@@ -1435,7 +1448,7 @@
       "n": 1,
       "user_id": "u_bl_lina",
       "user_name": "Lina Park",
-      "at": "2026-10-19T22:06:20.577Z",
+      "at": "2026-10-19T23:03:11.851Z",
       "summary": "Created flow",
       "snapshot": {
         "name": "Translate announcement to Urdu",
@@ -1492,7 +1505,7 @@
       "n": 2,
       "user_id": "u_bl_lina",
       "user_name": "Lina Park",
-      "at": "2026-10-21T22:06:20.577Z",
+      "at": "2026-10-21T23:03:11.851Z",
       "summary": "Added the remaining steps and connections",
       "snapshot": {
         "name": "Translate announcement to Urdu",
@@ -1549,7 +1562,7 @@
       "n": 1,
       "user_id": "u_ke_sam",
       "user_name": "Sam Okafor",
-      "at": "2026-10-23T22:06:20.577Z",
+      "at": "2026-10-23T23:03:11.851Z",
       "summary": "Created flow",
       "snapshot": {
         "name": "Freight rate watch",
@@ -1610,7 +1623,7 @@
       "n": 2,
       "user_id": "u_ke_sam",
       "user_name": "Sam Okafor",
-      "at": "2026-10-25T22:06:20.577Z",
+      "at": "2026-10-25T23:03:11.851Z",
       "summary": "Added the remaining steps and connections",
       "snapshot": {
         "name": "Freight rate watch",
@@ -1686,7 +1699,7 @@
       "n": 1,
       "user_id": "u_solo",
       "user_name": "Sol Individual",
-      "at": "2026-10-27T22:06:20.577Z",
+      "at": "2026-10-27T23:03:11.851Z",
       "summary": "Created flow",
       "snapshot": {
         "name": "Summarize my reading list",
@@ -1744,7 +1757,7 @@
       "n": 2,
       "user_id": "u_solo",
       "user_name": "Sol Individual",
-      "at": "2026-10-29T22:06:20.577Z",
+      "at": "2026-10-29T23:03:11.851Z",
       "summary": "Added the remaining steps and connections",
       "snapshot": {
         "name": "Summarize my reading list",
@@ -1803,8 +1816,8 @@
       "tenant_id": "t_brightloom",
       "user_id": "u_bl_ana",
       "status": "success",
-      "started_at": "2026-11-10T10:06:20.577Z",
-      "ended_at": "2026-11-10T10:06:20.577Z",
+      "started_at": "2026-11-10T11:03:11.851Z",
+      "ended_at": "2026-11-10T11:03:11.851Z",
       "credits": 7,
       "error": null
     },
@@ -1814,8 +1827,8 @@
       "tenant_id": "t_brightloom",
       "user_id": "u_bl_ana",
       "status": "success",
-      "started_at": "2026-11-11T17:18:20.577Z",
-      "ended_at": "2026-11-11T17:18:20.577Z",
+      "started_at": "2026-11-11T18:15:11.851Z",
+      "ended_at": "2026-11-11T18:15:11.851Z",
       "credits": 7,
       "error": null
     },
@@ -1825,8 +1838,8 @@
       "tenant_id": "t_brightloom",
       "user_id": "u_bl_ana",
       "status": "failed",
-      "started_at": "2026-11-13T00:30:20.577Z",
-      "ended_at": "2026-11-13T00:30:20.577Z",
+      "started_at": "2026-11-13T01:27:11.851Z",
+      "ended_at": "2026-11-13T01:27:11.851Z",
       "credits": 2,
       "error": "Search provider timed out after 10s. Check your connection and run again."
     },
@@ -1836,8 +1849,8 @@
       "tenant_id": "t_brightloom",
       "user_id": "u_bl_ana",
       "status": "success",
-      "started_at": "2026-11-14T07:42:20.577Z",
-      "ended_at": "2026-11-14T07:42:20.577Z",
+      "started_at": "2026-11-14T08:39:11.851Z",
+      "ended_at": "2026-11-14T08:39:11.851Z",
       "credits": 7,
       "error": null
     },
@@ -1847,8 +1860,8 @@
       "tenant_id": "t_brightloom",
       "user_id": "u_bl_ana",
       "status": "success",
-      "started_at": "2026-11-15T14:54:20.577Z",
-      "ended_at": "2026-11-15T14:54:20.577Z",
+      "started_at": "2026-11-15T15:51:11.851Z",
+      "ended_at": "2026-11-15T15:51:11.851Z",
       "credits": 7,
       "error": null
     },
@@ -1858,8 +1871,8 @@
       "tenant_id": "t_brightloom",
       "user_id": "u_bl_omar",
       "status": "success",
-      "started_at": "2026-11-14T07:42:20.577Z",
-      "ended_at": "2026-11-14T07:42:20.577Z",
+      "started_at": "2026-11-14T08:39:11.851Z",
+      "ended_at": "2026-11-14T08:39:11.851Z",
       "credits": 12,
       "error": null
     },
@@ -1869,8 +1882,8 @@
       "tenant_id": "t_brightloom",
       "user_id": "u_bl_omar",
       "status": "success",
-      "started_at": "2026-11-15T14:54:20.577Z",
-      "ended_at": "2026-11-15T14:54:20.577Z",
+      "started_at": "2026-11-15T15:51:11.851Z",
+      "ended_at": "2026-11-15T15:51:11.851Z",
       "credits": 12,
       "error": null
     },
@@ -1880,8 +1893,8 @@
       "tenant_id": "t_brightloom",
       "user_id": "u_bl_lina",
       "status": "success",
-      "started_at": "2026-11-14T07:42:20.577Z",
-      "ended_at": "2026-11-14T07:42:20.577Z",
+      "started_at": "2026-11-14T08:39:11.851Z",
+      "ended_at": "2026-11-14T08:39:11.851Z",
       "credits": 2,
       "error": null
     },
@@ -1891,8 +1904,8 @@
       "tenant_id": "t_brightloom",
       "user_id": "u_bl_lina",
       "status": "success",
-      "started_at": "2026-11-15T14:54:20.577Z",
-      "ended_at": "2026-11-15T14:54:20.577Z",
+      "started_at": "2026-11-15T15:51:11.851Z",
+      "ended_at": "2026-11-15T15:51:11.851Z",
       "credits": 2,
       "error": null
     },
@@ -1902,8 +1915,8 @@
       "tenant_id": "t_kestrel",
       "user_id": "u_ke_sam",
       "status": "success",
-      "started_at": "2026-11-14T07:42:20.577Z",
-      "ended_at": "2026-11-14T07:42:20.577Z",
+      "started_at": "2026-11-14T08:39:11.851Z",
+      "ended_at": "2026-11-14T08:39:11.851Z",
       "credits": 6,
       "error": null
     },
@@ -1913,8 +1926,8 @@
       "tenant_id": "t_kestrel",
       "user_id": "u_ke_sam",
       "status": "success",
-      "started_at": "2026-11-15T14:54:20.577Z",
-      "ended_at": "2026-11-15T14:54:20.577Z",
+      "started_at": "2026-11-15T15:51:11.851Z",
+      "ended_at": "2026-11-15T15:51:11.851Z",
       "credits": 6,
       "error": null
     },
@@ -1924,8 +1937,8 @@
       "tenant_id": null,
       "user_id": "u_solo",
       "status": "success",
-      "started_at": "2026-11-14T07:42:20.577Z",
-      "ended_at": "2026-11-14T07:42:20.577Z",
+      "started_at": "2026-11-14T08:39:11.851Z",
+      "ended_at": "2026-11-14T08:39:11.851Z",
       "credits": 3,
       "error": null
     },
@@ -1935,8 +1948,8 @@
       "tenant_id": null,
       "user_id": "u_solo",
       "status": "success",
-      "started_at": "2026-11-15T14:54:20.577Z",
-      "ended_at": "2026-11-15T14:54:20.577Z",
+      "started_at": "2026-11-15T15:51:11.851Z",
+      "ended_at": "2026-11-15T15:51:11.851Z",
       "credits": 3,
       "error": null
     }
@@ -3253,7 +3266,7 @@
       "actor_name": "Platform Admin",
       "action": "tenant.create",
       "target": "t_kestrel",
-      "at": "2026-09-17T22:06:20.577Z",
+      "at": "2026-09-17T23:03:11.851Z",
       "meta": {}
     },
     {
@@ -3263,7 +3276,7 @@
       "actor_name": "Maya Hussain",
       "action": "user.create",
       "target": "u_bl_ana",
-      "at": "2026-08-28T22:06:20.577Z",
+      "at": "2026-08-28T23:03:11.851Z",
       "meta": {}
     },
     {
@@ -3273,7 +3286,7 @@
       "actor_name": "Maya Hussain",
       "action": "user.create",
       "target": "u_bl_devon",
-      "at": "2026-10-12T22:06:20.577Z",
+      "at": "2026-10-12T23:03:11.851Z",
       "meta": {}
     },
     {
@@ -3283,7 +3296,7 @@
       "actor_name": "Maya Hussain",
       "action": "user.freeze",
       "target": "u_bl_devon",
-      "at": "2026-11-13T22:06:20.577Z",
+      "at": "2026-11-13T23:03:11.851Z",
       "meta": {
         "reason": "Left the team"
       }
@@ -3295,7 +3308,7 @@
       "actor_name": "Idris Kestrel",
       "action": "invoice.overdue",
       "target": "inv_t_kestrel_7",
-      "at": "2026-11-09T22:06:20.577Z",
+      "at": "2026-11-09T23:03:11.851Z",
       "meta": {}
     },
     {
@@ -3305,7 +3318,7 @@
       "actor_name": "Platform Admin",
       "action": "tenant.freeze",
       "target": "t_kestrel",
-      "at": "2026-11-11T22:06:20.577Z",
+      "at": "2026-11-11T23:03:11.851Z",
       "meta": {
         "reason": "Invoice INV-2026-0007 unpaid"
       }
@@ -3317,7 +3330,7 @@
       "actor_name": "Ana Torres",
       "action": "flow.create",
       "target": "f_news",
-      "at": "2026-11-14T22:06:20.577Z",
+      "at": "2026-11-14T23:03:11.851Z",
       "meta": {}
     },
     {
@@ -3327,7 +3340,7 @@
       "actor_name": "Sol Individual",
       "action": "user.register",
       "target": "u_solo",
-      "at": "2026-10-27T22:06:20.577Z",
+      "at": "2026-10-27T23:03:11.851Z",
       "meta": {}
     }
   ],

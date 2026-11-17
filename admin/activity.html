@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Activity · AgentFlow</title>
+  <link rel="icon" href="../assets/img/logo.svg" type="image/svg+xml">
+  <script src="../assets/js/theme-init.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+</head>
+<body data-root="../" data-path="admin/activity.html">
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div id="shell" class="shell" hidden>
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-col">
+      <header id="topbar" class="topbar"></header>
+      <main id="content" class="content" tabindex="-1">
+        <div class="page-head">
+          <div>
+            <h1 id="title">Activity</h1>
+            <p id="sub">Which devices and browsers your team uses, and who did what.</p>
+          </div>
+          <div id="head-actions" class="row"></div>
+        </div>
+        <div id="host"></div>
+      </main>
+    </div>
+  </div>
+  <noscript><p class="content">AgentFlow needs JavaScript to run. Enable it in your browser settings and reload this page.</p></noscript>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/tenancy.js"></script>
+  <script src="../assets/js/fallback-seed.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/ui.js"></script>
+  <script src="../assets/js/ui-kit.js"></script>
+  <script src="../assets/js/pages/admin-activity.js"></script>
+</body>
+</html>

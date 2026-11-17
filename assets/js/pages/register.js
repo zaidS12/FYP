@@ -29,7 +29,7 @@
     if (!v.ok) { showFieldErrors(v.errors); return; }
     submit.disabled = true; submit.textContent = 'Creating account…';
     const r = await AF.db.register(input);
-    if (r.ok) { location.href = AF.auth.homeFor(r.user.role, AF.ui.BUILT); return; }
+    if (r.ok) { location.href = AF.auth.homeFor(r.user.role); return; }
     submit.disabled = false; submit.textContent = 'Create free account';
     if (r.errors) showFieldErrors(r.errors);
     else { errorBox.replaceChildren(el('strong', { text: 'Could not create the account. ' }), r.error || 'Try again.'); errorBox.hidden = false; }

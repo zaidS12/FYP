@@ -35,9 +35,10 @@ function build(hash) {
   const pw = hash(DEMO_PASSWORD);
 
   const plans = [
-    { id: 'free', name: 'Free', price_usd: 0, seats: 1, credits_per_month: 100, extra_seat_usd: 0 },
-    { id: 'basic', name: 'Basic', price_usd: 100, seats: 10, credits_per_month: 5000, extra_seat_usd: 8 },
-    { id: 'pro', name: 'Pro', price_usd: 250, seats: 30, credits_per_month: 20000, extra_seat_usd: 6 },
+    { id: 'free', name: 'Free', price_usd: 0, seats: 1, credits_per_month: 100, extra_seat_usd: 0, audience: 'individual' },
+    { id: 'basic', name: 'Basic', price_usd: 100, seats: 10, credits_per_month: 5000, extra_seat_usd: 8, audience: 'company' },
+    { id: 'pro', name: 'Pro', price_usd: 250, seats: 30, credits_per_month: 20000, extra_seat_usd: 6, audience: 'company' },
+    { id: 'plus', name: 'Plus', price_usd: 12, seats: 1, credits_per_month: 1000, extra_seat_usd: 0, audience: 'individual' },
   ];
 
   const tenants = [
@@ -61,6 +62,7 @@ function build(hash) {
     mk('u_ke_noor', 't_kestrel', 'employee', 'Noor Fatima', 'noor@kestrel.test', 'active', 45 * DAY),
     mk('u_solo', null, 'individual', 'Sol Individual', 'solo@example.test', 'active', 20 * DAY),
   ];
+  users.filter(u => u.role === 'individual').forEach(u => { u.plan_id = 'free'; });
   users.forEach(u => { if (u.tenant_id && u.role === 'employee') u.created_by = u.tenant_id === 't_brightloom' ? 'u_bl_admin' : 'u_ke_admin'; });
 
   const subscriptions = tenants.map(t => ({ id: 'sub_' + t.id, tenant_id: t.id, plan_id: t.plan_id, status: t.status === 'frozen' ? 'suspended' : 'active', period_start: iso(12 * DAY), period_end: iso(-18 * DAY), extra_seats: 0 }));

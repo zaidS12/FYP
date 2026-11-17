@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Builder · AgentFlow</title>
+  <link rel="icon" href="../assets/img/logo.svg" type="image/svg+xml">
+  <script src="../assets/js/theme-init.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+</head>
+<body data-root="../" data-path="app/builder.html" class="builder-page">
+  <a class="skip-link" href="#canvas">Skip to the canvas</a>
+  <div class="b-small" role="note">
+    <h1>The builder needs a bigger screen</h1>
+    <p>Building flows works best on a tablet or larger (at least 900 pixels wide). Open this flow on a bigger screen, or rotate your device.</p>
+    <a class="btn btn-primary" href="flows.html">Back to my flows</a>
+  </div>
+  <div id="builder" class="builder" hidden>
+    <header class="b-top">
+      <a class="btn btn-ghost" href="flows.html" aria-label="Back to my flows"><span aria-hidden="true">←</span> Flows</a>
+      <input id="flow-name" class="b-name" type="text" maxlength="120" aria-label="Flow name" autocomplete="off">
+      <span id="ver-pill" class="badge" title="Saved version"></span>
+      <span id="save-state" class="b-state" role="status" aria-live="polite"></span>
+      <div class="b-tools" role="toolbar" aria-label="Canvas tools" id="tools"></div>
+      <div class="b-right" id="b-right"></div>
+    </header>
+    <div class="b-body">
+      <aside class="b-lib" aria-label="Card library">
+        <div class="b-lib-head"><h2>Cards</h2><input id="lib-search" class="input" type="search" placeholder="Search cards" aria-label="Search cards"></div>
+        <div id="lib" class="b-lib-list"></div>
+      </aside>
+      <main class="b-center">
+        <div id="canvas"></div>
+        <form id="architect" class="b-architect" autocomplete="off">
+          <label class="sr-only" for="architect-input">Describe the flow you want</label>
+          <input id="architect-input" class="input" type="text" placeholder="Describe a flow, e.g. Find daily AI news and email me a summary">
+          <button class="btn btn-primary" type="submit">Build it</button>
+        </form>
+        <div class="b-zoom" id="zoom" role="group" aria-label="Zoom"></div>
+        <section class="b-drawer" id="drawer" aria-label="Run results"></section>
+      </main>
+      <aside class="b-settings" id="settings" aria-label="Card settings"></aside>
+    </div>
+  </div>
+  <noscript><p class="content">AgentFlow needs JavaScript to run. Enable it in your browser settings and reload this page.</p></noscript>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/tenancy.js"></script>
+  <script src="../assets/js/fallback-seed.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/ui.js"></script>
+  <script src="../assets/js/ui-kit.js"></script>
+  <script src="../assets/js/billing.js"></script>
+  <script src="../assets/js/nodes.js"></script>
+  <script src="../assets/js/engine.js"></script>
+  <script src="../assets/js/canvas.js"></script>
+  <script src="../assets/js/pages/run-view.js"></script>
+  <script src="../assets/js/versions.js"></script>
+  <script src="../assets/js/architect.js"></script>
+  <script src="../assets/js/adapters/ai.js"></script>
+  <script src="../assets/js/exporter.js"></script>
+  <script src="../assets/js/collab.js"></script>
+  <script src="../assets/js/pages/builder-history.js"></script>
+  <script src="../assets/js/pages/builder.js"></script>
+</body>
+</html>

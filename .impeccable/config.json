@@ -10,7 +10,7 @@
           "assets/css/theme.css"
         ],
         "createdAt": "2026-11-16T22:21:46.912Z",
-        "reason": "agent design decision, docs/DESIGN.md: the category spine on the node tag is the intentional signature (spine + punch hole + hard shadow + pins); user has not yet confirmed, shown at design checkpoint"
+        "reason": "user confirmed: the owner approved the theme and the node category colour spine at the Phase 1 design checkpoint (docs/DESIGN.md)"
       },
       {
         "rule": "side-tab",
@@ -19,7 +19,7 @@
           "index.html"
         ],
         "createdAt": "2026-11-16T22:21:53.142Z",
-        "reason": "agent design decision, docs/DESIGN.md: same node-tag category spine reached through theme.css; user has not yet confirmed, shown at design checkpoint"
+        "reason": "user confirmed: the owner approved the node category colour spine (reached here through theme.css) at the Phase 1 design checkpoint"
       },
       {
         "rule": "side-tab",
@@ -28,7 +28,7 @@
           "register.html"
         ],
         "createdAt": "2026-11-16T22:21:53.332Z",
-        "reason": "agent design decision, docs/DESIGN.md: same node-tag category spine reached through theme.css; user has not yet confirmed, shown at design checkpoint"
+        "reason": "user confirmed: the owner approved the node category colour spine (reached here through theme.css) at the Phase 1 design checkpoint"
       },
       {
         "rule": "side-tab",
@@ -37,7 +37,13 @@
           "app/flows.html"
         ],
         "createdAt": "2026-11-16T22:21:53.535Z",
-        "reason": "agent design decision, docs/DESIGN.md: same node-tag category spine reached through theme.css; user has not yet confirmed, shown at design checkpoint"
+        "reason": "user confirmed: the owner approved the node category colour spine (reached here through theme.css) at the Phase 1 design checkpoint"
+      },
+      {
+        "rule": "overused-font",
+        "value": "instrument sans",
+        "createdAt": "2026-11-16T22:28:16.120Z",
+        "reason": "user confirmed: the owner approved keeping Instrument Sans with Bricolage Grotesque at the Phase 1 design checkpoint"
       }
     ]
   }

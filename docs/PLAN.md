@@ -83,7 +83,7 @@ accounts use PBKDF2 (WebCrypto). The server always uses scrypt.
 11. **Hardening, docs, migration notes** – `/security-scan`, coverage, README, MIGRATION.md.
 
 After each phase: `/code-review` (fresh context) → security-review → verification-loop (unit +
-server + Playwright) → update `PROGRESS.md` → commit.
+server + Playwright) → update `PROGRESS.md`. **No git commits until the owner says so.**
 
 ## Data model (`data/db.json` collections)
 

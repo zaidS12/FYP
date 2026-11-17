@@ -1,0 +1,24 @@
+# Render blueprint: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: agentflow
+    runtime: node
+    plan: free              # free has no persistent disk: data resets on restart. Use a paid plan + the disk below to keep data.
+    buildCommand: echo "no build step"
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DATA_DIR
+        value: /tmp/agentflow-data      # with a paid plan use /var/data and uncomment the disk
+      - key: ALLOW_FAKE_GATEWAY
+        value: "1"                      # demo only, see README "Deploy"
+    # disk:
+    #   name: agentflow-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

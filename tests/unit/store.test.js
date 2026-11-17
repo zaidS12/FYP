@@ -86,6 +86,22 @@ test('a corrupted db.json is kept aside as db.json.corrupt-* when restoring', ()
   assert.equal(fs.readFileSync(path.join(t.dir, kept[0]), 'utf8'), '{ broken');
 });
 
+test('replace() always takes a backup first (even inside the throttle window) and rolls back if the write fails', () => {
+  const t = tmp();
+  const s = new Store({ file: t.file, backupDir: t.backupDir, seedFile: t.seed, backupIntervalMs: 3600000 });
+  s.init(); s.data.flows.push({ id: 'before-import' }); s.save();
+  const countBefore = fs.existsSync(t.backupDir) ? fs.readdirSync(t.backupDir).length : 0;
+  s.replace({ users: [], flows: [{ id: 'after' }] });
+  const files = fs.readdirSync(t.backupDir);
+  assert.equal(files.length, countBefore + 1, 'forced backup even though the interval has not passed');
+  const newest = JSON.parse(fs.readFileSync(path.join(t.backupDir, files.sort().pop()), 'utf8'));
+  assert.ok(newest.flows.some(f => f.id === 'before-import'), 'the backup holds the data from before the replace');
+  const keep = s.data;
+  s._writeAtomic = () => { throw new Error('disk full'); };
+  assert.throws(() => s.replace({ users: [], flows: [{ id: 'never' }] }), /disk full/);
+  assert.equal(s.data, keep, 'in-memory data is restored when the write fails');
+});
+
 test('valid JSON that lacks collections gets every collection as an empty array', () => {
   const t = tmp();
   fs.writeFileSync(t.file, '{}');
@@ -101,4 +117,40 @@ test('replace() swaps the whole dataset after validating collections are objects
   assert.throws(() => s.replace({ users: 'x' }), /invalid/i);
   s.replace({ users: [], flows: [{ id: 'z' }] });
   assert.equal(s.data.flows[0].id, 'z');
+});
+
+test('saveSoon batches many changes into one write, and flush writes pending changes now', async () => {
+  const t = tmp();
+  const s = new Store({ file: t.file, backupDir: t.backupDir, seedFile: t.seed, debounceMs: 30 }).init();
+  let writes = 0; const orig = s._writeAtomic.bind(s); s._writeAtomic = () => { writes += 1; orig(); };
+  for (let i = 0; i < 20; i++) { s.data.users.push({ id: 'x' + i }); s.saveSoon(); }
+  assert.equal(writes, 0, 'nothing is written inside the window');
+  assert.equal(s.hasPendingWrite(), true);
+  await new Promise(r => setTimeout(r, 80));
+  assert.equal(writes, 1); assert.equal(s.hasPendingWrite(), false);
+  assert.equal(JSON.parse(fs.readFileSync(t.file, 'utf8')).users.length, 21);
+  s.data.users.push({ id: 'late' }); s.saveSoon(); s.flush();
+  assert.equal(writes, 2); assert.ok(JSON.parse(fs.readFileSync(t.file, 'utf8')).users.some(u => u.id === 'late'));
+  s.flush(); assert.equal(writes, 2, 'flush with nothing pending does nothing');
+});
+
+test('a normal save() also covers pending changes, so a later timer does not write twice', async () => {
+  const t = tmp();
+  const s = new Store({ file: t.file, backupDir: t.backupDir, seedFile: t.seed, debounceMs: 20 }).init();
+  let writes = 0; const orig = s._writeAtomic.bind(s); s._writeAtomic = () => { writes += 1; orig(); };
+  s.data.users.push({ id: 'a' }); s.saveSoon(); s.save();
+  assert.equal(writes, 1);
+  await new Promise(r => setTimeout(r, 60));
+  assert.equal(writes, 1);
+});
+
+test('a failed delayed write keeps the change pending and is reported, never thrown into the event loop', async () => {
+  const t = tmp(); const errors = [];
+  const s = new Store({ file: t.file, backupDir: t.backupDir, seedFile: t.seed, debounceMs: 10, onError: e => errors.push(e.message) }).init();
+  const orig = s._writeAtomic.bind(s); let fail = true; s._writeAtomic = () => { if (fail) throw new Error('disk full'); orig(); };
+  s.data.users.push({ id: 'keep' }); s.saveSoon();
+  await new Promise(r => setTimeout(r, 40));
+  assert.deepEqual(errors.slice(0, 1), ['disk full']); assert.equal(s.hasPendingWrite(), true);
+  fail = false; s.flush();
+  assert.ok(JSON.parse(fs.readFileSync(t.file, 'utf8')).users.some(u => u.id === 'keep'));
 });
