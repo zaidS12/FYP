@@ -20,6 +20,7 @@ const Account = require('./server/services/account.js');
 const Imp = require('./server/services/impersonation.js');
 const Merge = require('./server/services/merge.js');
 const Retention = require('./server/services/retention.js');
+const RemoteSync = require('./server/remote-sync.js');
 const { Collab } = require('./server/services/collab.js');
 const { createRunner } = require('./server/services/runs.js');
 const { FakeAIProvider } = require('./assets/js/adapters/ai.js');
@@ -58,6 +59,7 @@ function createServer(opts = {}) {
     backupDir: path.join(dataDir, 'backups'),
     seedFile: opts.seedFile || path.join(ROOT, 'data', 'seed.json'),
     debounceMs: opts.saveDebounceMs,
+    afterWrite: opts.afterWrite,
     onError: e => log('delayed save failed, will retry: ' + e.message),
   }).init();
   const trustProxy = !!opts.trustProxy;
@@ -586,14 +588,33 @@ function createServer(opts = {}) {
 }
 
 if (require.main === module) {
-  const port = Number(process.env.PORT) || 3000;
-  const host = process.env.HOST || '127.0.0.1';
-  const server = createServer({ trustProxy: process.env.TRUST_PROXY === '1', dataDir: process.env.DATA_DIR || undefined, allowFakeGateway: process.env.ALLOW_FAKE_GATEWAY === '1' });
-  server.listen(port, host, () => log(`running at http://localhost:${port}  (data: data/db.json)`));
-  // Write anything still waiting before the process ends.
-  const shutdown = signal => { try { server.store.flush(); } catch (e) { log('final save failed: ' + e.message); } log(`stopped (${signal})`); process.exit(0); };
-  process.on('SIGINT', () => shutdown('SIGINT')); process.on('SIGTERM', () => shutdown('SIGTERM'));
-  process.on('exit', () => { try { server.store.flush(); } catch (e) { /* nothing more to do */ } });
+  (async () => {
+    const port = Number(process.env.PORT) || 3000;
+    const host = process.env.HOST || '127.0.0.1';
+    const dataDir = process.env.DATA_DIR || path.join(ROOT, 'data');
+    // Optional off-machine copy of the database (hosts without a persistent disk). Needs REMOTE_STORE_URL + REMOTE_STORE_KEY.
+    let pusher = null;
+    if (process.env.REMOTE_STORE_URL && process.env.REMOTE_STORE_KEY) {
+      const cfg = { url: process.env.REMOTE_STORE_URL, key: process.env.REMOTE_STORE_KEY };
+      try {
+        const r = await RemoteSync.pull({ ...cfg, file: path.join(dataDir, 'db.json') });   // before the Store loads
+        log(r.restored ? 'restored the database from the remote store' : 'remote store is empty: starting from the seed');
+      } catch (e) { log('cannot start: ' + e.message); process.exit(1); }   // never start on an unreadable store, it could overwrite real data
+      pusher = RemoteSync.createPusher({ ...cfg, onError: e => log(e.message) });
+    }
+    const server = createServer({ trustProxy: process.env.TRUST_PROXY === '1', dataDir, allowFakeGateway: process.env.ALLOW_FAKE_GATEWAY === '1', afterWrite: pusher ? t => pusher.push(t) : undefined });
+    server.listen(port, host, () => log(`running at http://localhost:${port}  (data: ${pusher ? 'remote store + ' : ''}${path.relative(ROOT, path.join(dataDir, 'db.json')) || 'db.json'})`));
+    // Write anything still waiting (locally and to the remote store) before the process ends.
+    let closing = false;
+    const shutdown = async signal => {
+      if (closing) return; closing = true;
+      try { server.store.flush(); } catch (e) { log('final save failed: ' + e.message); }
+      if (pusher) { try { await pusher.drain(8000); } catch (e) { log('final upload failed: ' + e.message); } }
+      log(`stopped (${signal})`); process.exit(0);
+    };
+    process.on('SIGINT', () => shutdown('SIGINT')); process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('exit', () => { try { server.store.flush(); } catch (e) { /* nothing more to do */ } });
+  })();
 }
 
 module.exports = { createServer };

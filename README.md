@@ -108,13 +108,28 @@ design-reference/         the two proposal PDFs (read-only input)
 - [ ] Set `NODE_ENV=production` (adds the `Secure` cookie flag and HSTS) and serve over HTTPS; set `TRUST_PROXY=1` only behind one trusted proxy.
 - [ ] `scripts/build-seed.js` and `scripts/screenshots.js` are development tools, not for the deployed image.
 
-## Deploy (Render)
+## Deploy for free, data kept across restarts
 
-`render.yaml` describes a Render web service (Node, `node server.js`). It needs a long-running process, so it will not work as Vercel serverless functions.
-Set these environment variables (already in `render.yaml`): `NODE_ENV=production`, `HOST=0.0.0.0`, `TRUST_PROXY=1`, `DATA_DIR=/var/data`,
-`ALLOW_FAKE_GATEWAY=1` (demo only: without it the server refuses to start in production with the fake payment gateway).
-Data lives in `DATA_DIR`; on a plan without a persistent disk it resets on every deploy/restart (fine for a demo, not for real data).
-The demo accounts and password are public in this repository, so treat a deployed demo as public too.
+The app is one long-running Node process, so use a host that runs Node (Render, Railway, Koyeb, Fly...). Vercel's serverless functions do not fit
+(no live connections, no memory between requests). Free hosts have no persistent disk, so the server can copy its database to a **free Supabase
+project** and restore it on every start. Nothing else changes.
+
+1. **Supabase** (free): create a project, then in *SQL editor* run:
+   ```sql
+   create table agentflow_state (id text primary key, data jsonb not null, updated_at timestamptz default now());
+   alter table agentflow_state enable row level security;   -- no policies: only the secret service key can read/write
+   ```
+   Copy the *Project URL* and the **service_role** key (Settings > API). The table URL is `<Project URL>/rest/v1/agentflow_state`.
+2. **Render** (free): New > Blueprint > pick this repository (reads `render.yaml`). In the dashboard set the two secret variables
+   `REMOTE_STORE_URL` (the table URL above) and `REMOTE_STORE_KEY` (the service_role key). Everything else is in `render.yaml`.
+3. First start: the table is empty, so the app starts from the demo seed and uploads it. After that every restart restores the latest data.
+   If Supabase cannot be read (wrong key, outage) the server **refuses to start** instead of starting empty and overwriting your data.
+
+Notes: free Render sleeps after ~15 minutes without visitors (the first visit then takes about a minute); a free uptime pinger such as UptimeRobot hitting
+`/api/health` every 5 minutes keeps it awake. Changes are uploaded about 2 seconds after they happen and on shutdown, so a hard crash can lose the last
+couple of seconds. The service_role key is a secret: keep it in environment variables only. The demo accounts and password are public in this repository,
+so treat a deployed demo as public too (`ALLOW_FAKE_GATEWAY=1` lets the fake payment gateway run in production for the demo).
+Other hosts: use the same environment variables as in `render.yaml` (`NODE_ENV`, `HOST=0.0.0.0`, `TRUST_PROXY=1`, `DATA_DIR`, `REMOTE_STORE_*`, `ALLOW_FAKE_GATEWAY`).
 
 ## Known limits of the prototype
 

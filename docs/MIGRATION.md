@@ -11,7 +11,7 @@ Python port can reuse the test cases as a specification.
 |---|---|---|
 | `server.js` (router, cookies, headers, SSE) | HTTP API, static pages | Flask app (blueprints per area), Nginx for static files |
 | `server/security.js` | scrypt hashing, tokens, rate limiter, cookies | `werkzeug.security` or `argon2`, Flask-Limiter, Flask-JWT-Extended cookies |
-| `server/store.js` (+ `data/db.json`, backups) | JSON file with atomic writes | SQLAlchemy models + Alembic migrations on MySQL; backups = `mysqldump` |
+| `server/store.js`, `server/remote-sync.js` (+ `data/db.json`, backups) | JSON file with atomic writes; optional copy of the whole db into one Supabase row for free hosting | SQLAlchemy models + Alembic migrations on MySQL; backups = `mysqldump` |
 | `server/services/users.js` | accounts, seats, devices, login events | `services/users.py`, tables `users`, `devices`, `login_events` |
 | `server/services/tenants.js`, `ledger.js`, `backup.js` | companies, invoices, audit, import/export | `services/tenants.py`, `billing.py`, `audit.py`; export/import as admin CLI + endpoints |
 | `server/services/billing.js` + `server/adapters/payment.js` | seats, plans, invoices, simulated gateway | `PaymentGateway` interface; Stripe (or local gateway) implementation |

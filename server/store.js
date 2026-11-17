@@ -7,10 +7,10 @@ const COLLECTIONS = ['tenants', 'users', 'sessions', 'devices', 'loginEvents', '
   'flows', 'flowVersions', 'runs', 'runSteps', 'templates', 'usage', 'auditLog', 'presence', 'locks'];
 
 class Store {
-  constructor({ file, backupDir, seedFile, maxBackups = 20, backupIntervalMs = 30000, now = Date.now, debounceMs = 250, onError = null }) {
+  constructor({ file, backupDir, seedFile, maxBackups = 20, backupIntervalMs = 30000, now = Date.now, debounceMs = 250, onError = null, afterWrite = null }) {
     this.file = file; this.backupDir = backupDir; this.seedFile = seedFile;
     this.maxBackups = maxBackups; this.backupIntervalMs = backupIntervalMs; this.now = now;
-    this.debounceMs = debounceMs; this.onError = onError; this._timer = null; this._pending = false;
+    this.debounceMs = debounceMs; this.onError = onError; this.afterWrite = afterWrite; this._timer = null; this._pending = false;
     this.data = null; this.recovered = false; this._lastBackup = 0; this._seq = 0;
   }
 
@@ -52,8 +52,10 @@ class Store {
 
   _writeAtomic() {
     const tmp = this.file + '.' + process.pid + '.tmp';
-    fs.writeFileSync(tmp, JSON.stringify(this.data, null, 2));
+    const text = JSON.stringify(this.data, null, 2);
+    fs.writeFileSync(tmp, text);
     fs.renameSync(tmp, this.file);
+    if (this.afterWrite) { try { this.afterWrite(text); } catch (e) { if (this.onError) this.onError(e); } }   // e.g. copy to an off-machine store; never fails the save
   }
 
   _backup(force) {
