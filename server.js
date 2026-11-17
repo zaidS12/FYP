@@ -365,7 +365,12 @@ function createServer(opts = {}) {
   const providers = opts.providers || { ai: new FakeAIProvider(), search: new FakeSearchProvider(), mail: new FakeMailProvider() };
   const runner = createRunner({ store, providers, stepDelayMs: opts.stepDelayMs === undefined ? 350 : opts.stepDelayMs });
   if (runner.recover()) log('marked runs that were interrupted by the last shutdown as failed');
-  addRoute('POST', '/api/flows/:id/runs', async (req, res, url, p) => { const a = requireAuth(req); respond(res, runner.start(actorOf(a), p.id, await readJson(req))); });
+  addRoute('POST', '/api/flows/:id/runs', async (req, res, url, p) => {
+    const a = requireAuth(req); const r = runner.start(actorOf(a), p.id, await readJson(req));
+    // Serverless hosts freeze the process once the answer is sent, so a run cannot continue in the background there: finish it first.
+    if (opts.inlineRuns && r.ok) { await runner.whenDone(r.run.id); const done = runner.get(actorOf(a), r.run.id); if (done.ok) return respond(res, { ok: true, status: 202, run: done.run, steps: done.steps }); }
+    respond(res, r);
+  });
   addRoute('GET', '/api/runs', async (req, res, url) => respond(res, runner.list(actorOf(requireAuth(req)), Object.fromEntries(url.searchParams))));
   addRoute('GET', '/api/runs/:id', async (req, res, url, p) => respond(res, runner.get(actorOf(requireAuth(req)), p.id)));
   addRoute('POST', '/api/runs/:id/stop', async (req, res, url, p) => { const a = requireAuth(req); await readJson(req); respond(res, runner.stop(actorOf(a), p.id)); });
@@ -446,6 +451,7 @@ function createServer(opts = {}) {
     send(res, 200, { ok: true });
   });
   addRoute('GET', '/api/flows/:id/events', async (req, res, url, p) => {
+    if (opts.disableLive) throw new HttpError(404, 'Live updates are not available on this host. The page polls instead.');   // serverless: no long-lived connections
     const c = collabContext(req, p.id, null);
     const conns = hub.get(p.id) || new Set(); hub.set(p.id, conns);
     if (conns.size >= MAX_STREAMS_PER_FLOW) throw new HttpError(429, 'Too many live connections for this flow.');

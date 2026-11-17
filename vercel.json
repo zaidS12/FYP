@@ -1,0 +1,10 @@
+{
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30,
+      "includeFiles": "{index.html,register.html,assets/**,app/**,admin/**,super/**,data/seed.json,server/**,server.js}"
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+}

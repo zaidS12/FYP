@@ -1,0 +1,11 @@
+node_modules
+tests
+design-reference
+docs/screenshots
+test-results
+playwright-report
+coverage
+data/db.json
+data/backups
+.claude
+.impeccable

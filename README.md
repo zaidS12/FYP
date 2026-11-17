@@ -138,6 +138,18 @@ couple of seconds. The service_role key is a secret: keep it in environment vari
 so treat a deployed demo as public too (`ALLOW_FAKE_GATEWAY=1` lets the fake payment gateway run in production for the demo).
 Other hosts: use the same environment variables as in `render.yaml` (`NODE_ENV`, `HOST=0.0.0.0`, `TRUST_PROXY=1`, `DATA_DIR`, `REMOTE_STORE_*`, `ALLOW_FAKE_GATEWAY`).
 
+## Deploy on Vercel (free, no card)
+
+Vercel runs code only while a request is being answered, so the repository contains a serverless adapter (`api/index.js`, `server/serverless.js`,
+`vercel.json`). It needs the same free Supabase table as above and two environment variables in the Vercel project: `REMOTE_STORE_URL` and
+`REMOTE_STORE_KEY`. How it behaves differently from the normal server:
+
+- the whole database is loaded from Supabase and **every change is stored before the answer is sent**, so nothing is lost when Vercel freezes the function;
+- before each request a tiny check reloads the data if another function instance changed it;
+- a Run finishes inside its request (Stop is not useful there), and live streams are replaced by polling every few seconds;
+- two changes at exactly the same moment on different instances can overwrite each other, and presence/lock information is per instance, so co-work
+  is less precise than on the normal server. Use `start-agentflow.bat` or a normal Node host when exact live co-work matters.
+
 ## Known limits of the prototype
 
 - Single Node process and one JSON file: fine for a demo, not for many concurrent companies (MySQL in the real stack).
