@@ -22,7 +22,14 @@ Progress log: [docs/PROGRESS.md](docs/PROGRESS.md). The full brief: [docs/BUILD_
 - **Billing:** plans, extra seats, simulated card checkout, invoices, overdue handling, company freeze.
 - Light and dark themes, keyboard operable, reduced motion respected.
 
-## Run it
+## Run it on your own computer (no online service needed)
+
+Double-click **`start-agentflow.bat`** (Windows). It starts the server and opens http://localhost:3000 in your browser. Everything runs on your
+computer; data is kept in `data/db.json` (with automatic backups in `data/backups/`) and is still there after you close the window and start it again.
+You only need Node.js (LTS) installed. Close the window to stop the app. To let other people on the same Wi-Fi use it, run
+`set HOST=0.0.0.0` before `node server.js` and share `http://<your-ip>:3000` (use only on a network you trust; the demo password is public).
+
+## Run it (command line)
 
 Requires Node 18+. The project path contains a space, so quote it in a terminal.
 
