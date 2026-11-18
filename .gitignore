@@ -6,3 +6,5 @@ data/*.tmp
 coverage/
 test-results/
 playwright-report/
+
+.vercel
