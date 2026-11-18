@@ -21,7 +21,7 @@ async function drag(page, from, to, offset = { x: 0, y: 0 }) {
 }
 
 test('a new flow opens with Start and End joined, and no problems', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Builder walkthrough');
   await expect(page.locator('.cv-node')).toHaveCount(2);
   await expect(page.locator('.wire-group')).toHaveCount(1);
@@ -31,7 +31,7 @@ test('a new flow opens with Start and End joined, and no problems', async ({ pag
 });
 
 test('add cards by clicking and by dragging from the library; problems show on the card itself', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Cards test');
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
   await expect(page.locator('.cv-node')).toHaveCount(3);
@@ -47,7 +47,7 @@ test('add cards by clicking and by dragging from the library; problems show on t
 });
 
 test('only one Start card is allowed', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'One start');
   await page.getByRole('button', { name: /^Add Start card/ }).click();
   await expect(page.locator('.toast.is-error')).toContainText('only have one Start');
@@ -55,7 +55,7 @@ test('only one Start card is allowed', async ({ page }) => {
 });
 
 test('delete a connection, rewire through a new card, and the problems clear', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Rewire');
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
   await page.locator('.wire-group .wire-hit').first().click({ force: true });
@@ -70,7 +70,7 @@ test('delete a connection, rewire through a new card, and the problems clear', a
 });
 
 test('invalid connections are refused with a reason', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Bad wire');
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
   const boxes = await Promise.all(['Start', 'End', 'Summarize'].map(async t => card(page, t).boundingBox()));
@@ -85,7 +85,7 @@ test('invalid connections are refused with a reason', async ({ page }) => {
 });
 
 test('required settings are shown on the card and clear when filled in', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Email flow');
   await page.getByRole('button', { name: /^Add Write Email card/ }).click();
   await expect(card(page, 'Write Email').locator('.meta')).not.toHaveText('');
@@ -95,15 +95,15 @@ test('required settings are shown on the card and clear when filled in', async (
   await drag(page, card(page, 'Write Email').locator('.pin.out'), card(page, 'End'));
   await page.locator('.cv-node', { hasText: 'Write Email' }).click();
   await expect(card(page, 'Write Email').locator('.meta')).toContainText('Fill in "Send to"');
-  await page.locator('#settings').getByLabel('Send to').fill('team@brightloom.test');
+  await page.locator('#settings').getByLabel('Send to').fill('team@agentflow.com');
   await expect(card(page, 'Write Email').locator('.meta')).toContainText('Fill in "Subject"');
   await page.locator('#settings').getByLabel('Subject').fill('Daily digest');
-  await expect(card(page, 'Write Email').locator('.meta')).toContainText('To team@brightloom.test');
+  await expect(card(page, 'Write Email').locator('.meta')).toContainText('To team@agentflow.com');
   await expect(page.getByRole('button', { name: /No problems found/ })).toBeVisible();
 });
 
 test('undo and redo, duplicate, delete and keyboard nudge', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Keys');
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
   await expect(page.locator('.cv-node')).toHaveCount(3);
@@ -126,7 +126,7 @@ test('undo and redo, duplicate, delete and keyboard nudge', async ({ page }) => 
 });
 
 test('auto-align tidies cards, and zoom works', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Align');
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
   await page.getByRole('button', { name: 'Auto-align cards' }).click();
@@ -141,7 +141,7 @@ test('auto-align tidies cards, and zoom works', async ({ page }) => {
 });
 
 test('opening a wide flow keeps cards readable (at least 85%) and "Fit all" shows everything', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await page.goto('/app/builder.html?id=f_report');
   await page.waitForSelector('.cv-node');
   const zoom = async () => Number((await page.locator('#zoom .btn-sm').innerText()).replace('%', ''));
@@ -159,7 +159,7 @@ test('opening a wide flow keeps cards readable (at least 85%) and "Fit all" show
 });
 
 test('the library folds by category, remembers it, and search opens matching groups', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Library test');
   const ai = page.getByRole('button', { name: /^AI/ });
   await expect(ai).toHaveAttribute('aria-expanded', 'true');
@@ -179,7 +179,7 @@ test('the library folds by category, remembers it, and search opens matching gro
 });
 
 test('save creates a version, a reload shows the same flow, and leaving with unsaved changes is guarded', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Persisted');
   const url = page.url();
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
@@ -199,7 +199,7 @@ test('save creates a version, a reload shows the same flow, and leaving with uns
 });
 
 test('two people saving different things: the second save is merged, nothing is overwritten', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Merge flow');
   const id = new URL(page.url()).searchParams.get('id');
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
@@ -213,7 +213,7 @@ test('two people saving different things: the second save is merged, nothing is 
 });
 
 test('two people changing the same thing: the second save gets a clear choice instead of silently overwriting', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Conflict flow');
   const id = new URL(page.url()).searchParams.get('id');
   await page.locator('#flow-name').fill('My own new name');
@@ -229,7 +229,7 @@ test('two people changing the same thing: the second save gets a clear choice in
 });
 
 test('my cards: save a configured card, find it in the library, and remove it', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Custom cards');
   await page.getByRole('button', { name: /^Add Translate card/ }).click();
   await page.locator('#settings').getByLabel('Translate into').fill('Urdu');
@@ -249,7 +249,7 @@ test('my cards: save a configured card, find it in the library, and remove it', 
 });
 
 test('read-only: super admin and colleagues without edit rights can look but not change', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/app/builder.html?id=f_news');
   await page.waitForSelector('.cv-node');
   await expect(page.getByText('View only').first()).toBeVisible();
@@ -274,7 +274,7 @@ test('read-only: super admin and colleagues without edit rights can look but not
 });
 
 test('keyboard only: Tab selects a card, arrows move it, the settings panel connects and removes wires, Delete removes the card', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Keyboard only');
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
   await page.locator('.wire-group .wire-hit').first().click({ force: true }); await page.locator('.cv-wire-del').click();
@@ -298,7 +298,7 @@ test('keyboard only: Tab selects a card, arrows move it, the settings panel conn
 });
 
 test('holding an arrow key is one undo step and does not wipe earlier history', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Held key');
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
   await expect(page.locator('.cv-node')).toHaveCount(3);
@@ -313,7 +313,7 @@ test('holding an arrow key is one undo step and does not wipe earlier history', 
 });
 
 test('undo then keep typing, then redo, does not bring back old text', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Typing undo');
   await page.getByRole('button', { name: /^Add Translate card/ }).click();
   const field = page.locator('#settings').getByLabel('Translate into');
@@ -326,14 +326,14 @@ test('undo then keep typing, then redo, does not bring back old text', async ({ 
 });
 
 test('clicking an output pin without dragging is not an error', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Pin click');
   await card(page, 'Start').locator('.pin.out').click();
   await expect(page.locator('.toast.is-error')).toHaveCount(0);
 });
 
 test('a flow that does not exist, or belongs to another company, shows a clear page', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await page.goto('/app/builder.html?id=f_ke');
   await expect(page.getByRole('heading', { name: 'This flow could not be opened' })).toBeVisible();
   await page.goto('/app/builder.html?id=nope');
@@ -343,7 +343,7 @@ test('a flow that does not exist, or belongs to another company, shows a clear p
 });
 
 test('on a phone-sized screen the builder explains it needs a bigger screen', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await page.setViewportSize({ width: 700, height: 800 });
   await page.goto('/app/builder.html?id=f_news');
   await expect(page.getByRole('heading', { name: 'The builder needs a bigger screen' })).toBeVisible();

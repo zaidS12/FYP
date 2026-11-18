@@ -4,7 +4,7 @@ const { loginOk, api } = require('./helpers');
 
 test('credit exhaustion: runs are blocked with a clear message, in the builder and over the API', async ({ page }) => {
   test.setTimeout(90000);
-  await loginOk(page, 'solo@example.test');
+  await loginOk(page, 'solo@example.com');
   const nodes = [
     { id: 'n1', type: 'start', label: 'Start', x: 80, y: 160, config: {} },
     { id: 'n2', type: 'research_bot', label: 'Research', x: 380, y: 160, config: { topic: 'solar panels', depth: 'deep' } },

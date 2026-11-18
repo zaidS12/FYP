@@ -51,7 +51,7 @@ test('a run executes the saved flow, records every step, charges the company and
   await runner.whenDone(r.run.id);
   const run = data.runs.find(x => x.id === r.run.id);
   assert.equal(run.status, 'success'); assert.equal(run.credits, 7); assert.equal(run.user_name, 'Ana Torres'); assert.equal(run.flow_name, 'Daily AI news digest'); assert.equal(run.flow_version, 2);
-  assert.match(run.output, /Sent to team@brightloom\.test/); assert.ok(run.ended_at && run.logs.length > 0);
+  assert.match(run.output, /Sent to team@agentflow.com/); assert.ok(run.ended_at && run.logs.length > 0);
   const steps = data.runSteps.filter(s => s.run_id === run.id).sort((a, b) => a.n - b.n);
   assert.deepEqual(steps.map(s => s.type), ['start', 'search_web', 'summarize', 'write_email', 'end']);
   assert.ok(steps.every(s => s.status === 'success' && s.tenant_id === 't_brightloom'));

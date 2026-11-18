@@ -9,7 +9,7 @@ async function twoPeople(browser, baseURL) {
     const ctx = await browser.newContext({ baseURL, viewport: { width: 1440, height: 900 } });
     const page = await ctx.newPage(); await loginOk(page, email); return { ctx, page };
   };
-  return { ana: await open('ana@brightloom.test'), omar: await open('omar@brightloom.test') };
+  return { ana: await open('ana@agentflow.com'), omar: await open('omar@agentflow.com') };
 }
 
 /** A shared flow with two editable cards (Alpha, Beta) next to Start and End. */
@@ -98,7 +98,7 @@ test('a super admin acting as Ana shows as "Actor (as Ana)" and holds the lock f
   const root = await rootCtx.newPage();
   try {
     const id = await makeSharedFlow(ana.page);
-    await loginOk(root, 'super@agentflow.test');
+    await loginOk(root, 'super@agentflow.com');
     expect((await api(root, 'POST', '/api/impersonation/start', { user_id: 'u_bl_ana' })).status).toBe(200);
     await root.goto('/app/builder.html?id=' + id); await root.waitForSelector('.cv-node');
     await omar.page.goto('/app/builder.html?id=' + id); await omar.page.waitForSelector('.cv-node');

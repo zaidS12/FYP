@@ -13,7 +13,7 @@ const edge = (id, from, to, fromPort = 'out') => ({ id, from, fromPort, to, toPo
 const quiet = extra => Object.assign({ providers: providers(), sleep: async () => {} }, extra);
 const TEXT = 'AI is moving fast. Models got cheaper. Teams adopt agents. Regulation is coming. Final line here.';
 const digest = (over = {}) => ({
-  nodes: [node('s', 'start', { input_text: TEXT }), node('a', 'search_web', Object.assign({ query: 'ai news', max_results: 3 }, over.search)), node('b', 'summarize', { style: 'bullets', max_words: 40 }), node('m', 'write_email', Object.assign({ to: 'team@brightloom.test', subject: 'Digest' }, over.mail)), node('e', 'end')],
+  nodes: [node('s', 'start', { input_text: TEXT }), node('a', 'search_web', Object.assign({ query: 'ai news', max_results: 3 }, over.search)), node('b', 'summarize', { style: 'bullets', max_words: 40 }), node('m', 'write_email', Object.assign({ to: 'team@agentflow.com', subject: 'Digest' }, over.mail)), node('e', 'end')],
   edges: [edge('1', 's', 'a'), edge('2', 'a', 'b'), edge('3', 'b', 'm'), edge('4', 'm', 'e')],
 });
 const types = r => r.steps.map(s => s.type);
@@ -41,7 +41,7 @@ test('a chain runs in order, passes each output to the next card, and charges pe
   assert.equal(r.credits, 7);
   assert.equal(r.steps[2].input, r.steps[1].output, 'summarize receives what search produced');
   assert.equal(r.steps[3].input, r.steps[2].output);
-  assert.match(r.output, /Sent to team@brightloom\.test/);
+  assert.match(r.output, /Sent to team@agentflow.com/);
   assert.equal(p.mail.sent.length, 1); assert.equal(p.mail.sent[0].subject, 'Digest');
   assert.equal(r.vars.a, r.steps[1].output, 'context variables hold each card output');
   assert.equal(events[0].type, 'run_start'); assert.equal(events[events.length - 1].type, 'run_end');

@@ -7,7 +7,7 @@ test.describe.configure({ mode: 'serial' });
 const banner = page => page.locator('.imp-banner');
 
 test('super admin enters an employee account, runs a flow there, sees the banner, and returns', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/super/tenant-detail.html?id=t_brightloom');
   await page.getByRole('button', { name: /^Login as Ana/ }).click();
   await page.waitForURL(/app\/flows\.html/);
@@ -40,7 +40,7 @@ test('super admin enters an employee account, runs a flow there, sees the banner
 });
 
 test('company admin enters their own employee, and is refused for another company by UI and API', async ({ page }) => {
-  await loginOk(page, 'admin@brightloom.test');
+  await loginOk(page, 'admin@agentflow.com');
   await page.goto('/admin/employees.html');
   await expect(page.getByRole('button', { name: /^Login as Omar/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /^Login as Devon/ })).toHaveCount(0); // frozen employee
@@ -56,12 +56,12 @@ test('company admin enters their own employee, and is refused for another compan
 });
 
 test('plain employees have no way to impersonate', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   expect((await api(page, 'POST', '/api/impersonation/start', { user_id: 'u_bl_omar' })).status).toBe(403);
 });
 
 test('super admin may inspect a frozen company; the banner says so', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   expect((await api(page, 'POST', '/api/impersonation/start', { user_id: 'u_ke_sam' })).status).toBe(200);
   await page.goto('/app/flows.html');
   await expect(banner(page)).toContainText('Frozen account');

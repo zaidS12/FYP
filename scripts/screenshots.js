@@ -33,7 +33,7 @@ const OUT = path.join(ROOT, 'docs', 'screenshots');
       await shot('register');
 
       await page.goto(base + '/index.html');
-      await page.fill('#email', 'ana@brightloom.test');
+      await page.fill('#email', 'ana@agentflow.com');
       await page.fill('#password', 'AgentFlow#2026');
       await Promise.all([page.waitForURL('**/app/flows.html'), page.click('#login-submit')]);
       await page.waitForSelector('#host table');

@@ -17,7 +17,7 @@ const close = srv => new Promise(r => srv.close(r));
 test('data survives a restart, including changes still waiting in the delayed-write window', async () => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'af restart test '));
   let { srv, base } = await open(dataDir);
-  const login = await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '10.3.0.1' }, body: JSON.stringify({ email: 'ana@brightloom.test', password: 'AgentFlow#2026' }) });
+  const login = await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '10.3.0.1' }, body: JSON.stringify({ email: 'ana@agentflow.com', password: 'AgentFlow#2026' }) });
   const cookie = (login.headers.get('set-cookie') || '').split(';')[0];
   const made = await (await fetch(base + '/api/flows', { method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: cookie }, body: JSON.stringify({ name: 'Survives restarts' }) })).json();
   const run = await (await fetch(base + '/api/flows/' + made.flow.id + '/runs', { method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: cookie }, body: '{}' })).json();

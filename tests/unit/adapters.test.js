@@ -56,10 +56,10 @@ test('search returns the requested number of deterministic, simulated results', 
 
 test('mail never leaves the building: it records the message, rejects bad and bouncing addresses', async () => {
   const m = new FakeMailProvider();
-  const r = await m.send({ to: 'team@brightloom.test', subject: 'Hi', body: 'Body' });
+  const r = await m.send({ to: 'team@agentflow.com', subject: 'Hi', body: 'Body' });
   assert.match(r.id, /^msg_0001/); assert.equal(r.status, 'sent (simulated)');
   assert.equal(m.sent.length, 1); assert.equal(m.sent[0].subject, 'Hi');
-  assert.notEqual((await m.send({ to: 'team@brightloom.test', subject: 'Hi', body: 'B' })).id, r.id);
+  assert.notEqual((await m.send({ to: 'team@agentflow.com', subject: 'Hi', body: 'B' })).id, r.id);
   await assert.rejects(() => m.send({ to: 'x@bounce.test', subject: 's', body: 'b' }), e => e.code === 'mail_rejected' && /rejected/.test(e.message));
   await assert.rejects(() => m.send({ to: 'not-an-address', subject: 's', body: 'b' }), e => e.code === 'bad_address');
   assert.equal(m.sent.length, 2);

@@ -8,7 +8,7 @@ test.describe.configure({ mode: 'serial' });
 const row = (page, name) => page.locator('tbody tr', { hasText: name });
 
 test('flows page: create a flow, rename it, duplicate it, share it and delete the copy', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await expect(page.locator('.card.section', { hasText: 'credits used' })).toBeVisible();
   await page.getByRole('button', { name: 'New flow' }).click();
   const dlg = page.getByRole('dialog');
@@ -31,20 +31,20 @@ test('flows page: create a flow, rename it, duplicate it, share it and delete th
 });
 
 test('PRIVATE vs SHARED: a colleague sees a flow only after it is shared', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await api(page, 'POST', '/api/flows', { name: 'Secret plan' });
   await logout(page);
-  await loginOk(page, 'omar@brightloom.test');
+  await loginOk(page, 'omar@agentflow.com');
   await expect(page.locator('#host')).toContainText('E2E Digest v2');
   await expect(page.locator('#host')).not.toContainText('Secret plan');
   await logout(page);
-  await loginOk(page, 'admin@brightloom.test');
+  await loginOk(page, 'admin@agentflow.com');
   await page.goto('/app/flows.html');
   await expect(page.locator('#host')).toContainText('Secret plan');
 });
 
 test('search and filter narrow the list', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await page.getByLabel('Search flows').fill('digest');
   await expect(row(page, 'Daily AI news digest')).toBeVisible();
   await expect(row(page, 'Competitor research report')).toHaveCount(0);
@@ -54,7 +54,7 @@ test('search and filter narrow the list', async ({ page }) => {
 });
 
 test('templates: use one and a private copy is created', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await page.goto('/app/templates.html');
   await expect(page.getByRole('heading', { name: 'Daily AI news digest' })).toBeVisible();
   await page.getByRole('button', { name: 'Use template Quick summary' }).click();
@@ -67,7 +67,7 @@ test('templates: use one and a private copy is created', async ({ page }) => {
 });
 
 test('import a flow from a JSON file', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   const [chooser] = await Promise.all([page.waitForEvent('filechooser'), page.getByRole('button', { name: 'Import flow (JSON)' }).click()]);
   const flow = { format: 'agentflow-flow', version: 1, flow: { name: 'Imported by e2e', nodes: [{ id: 'n1', type: 'start', label: 'Start', x: 0, y: 0, config: {} }, { id: 'n2', type: 'end', label: 'End', x: 200, y: 0, config: {} }], edges: [{ id: 'e1', from: 'n1', to: 'n2' }] } };
   await chooser.setFiles({ name: 'flow.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(flow)) });
@@ -80,7 +80,7 @@ test('import a flow from a JSON file', async ({ page }) => {
 });
 
 test('super admin sees every flow but cannot create or change them', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/app/flows.html');
   await expect(page.getByRole('button', { name: 'New flow' })).toHaveCount(0);
   await expect(page.locator('#host')).toContainText('Freight rate watch');
@@ -89,9 +89,9 @@ test('super admin sees every flow but cannot create or change them', async ({ pa
 });
 
 test('account: change name, change password, switch theme, see devices', async ({ page }) => {
-  await loginOk(page, 'lina@brightloom.test');
+  await loginOk(page, 'lina@agentflow.com');
   await page.goto('/app/account.html');
-  await expect(page.locator('.kv')).toContainText('lina@brightloom.test');
+  await expect(page.locator('.kv')).toContainText('lina@agentflow.com');
   await expect(page.getByText('Credits are shared by everyone in your company')).toBeVisible();
   await page.getByRole('button', { name: 'Change password' }).click();
   let dlg = page.getByRole('dialog');
@@ -107,14 +107,14 @@ test('account: change name, change password, switch theme, see devices', async (
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByRole('cell', { name: /Chrome/ }).first()).toBeVisible();
   await logout(page);
-  await login(page, 'lina@brightloom.test', 'AgentFlow#2026');
+  await login(page, 'lina@agentflow.com', 'AgentFlow#2026');
   await expect(page.locator('#login-error')).toContainText('incorrect');
-  await loginOk(page, 'lina@brightloom.test', 'Fresh#Pass4');
+  await loginOk(page, 'lina@agentflow.com', 'Fresh#Pass4');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
 
 test('individual: upgrade to Plus with a card, see the invoice, then switch back to Free', async ({ page }) => {
-  await loginOk(page, 'solo@example.test');
+  await loginOk(page, 'solo@example.com');
   await page.goto('/app/account.html');
   await expect(page.getByText(/of 100 credits used/)).toBeVisible();
   await page.getByRole('button', { name: /Upgrade to Plus and pay \$12 today/ }).click();
@@ -134,7 +134,7 @@ test('individual: upgrade to Plus with a card, see the invoice, then switch back
 });
 
 test('an employee sees no plan or billing controls on the account page', async ({ page }) => {
-  await loginOk(page, 'omar@brightloom.test');
+  await loginOk(page, 'omar@agentflow.com');
   await page.goto('/app/account.html');
   await expect(page.getByRole('button', { name: /Upgrade/ })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Your plan' })).toHaveCount(0);

@@ -29,7 +29,7 @@ test('getAccount bundles profile, usage, and own invoices', () => {
   const d = fresh();
   const r = A.getAccount(d, actor(d, 'u_bl_ana'));
   assert.equal(r.ok, true);
-  assert.deepEqual([r.account.user.email, r.account.company, r.account.role_label], ['ana@brightloom.test', 'Brightloom Studio', 'Employee']);
+  assert.deepEqual([r.account.user.email, r.account.company, r.account.role_label], ['ana@agentflow.com', 'Brightloom Studio', 'Employee']);
   assert.equal(JSON.stringify(r).includes('password_hash'), false);
   assert.equal(r.account.plans.length, 0, 'employees cannot upgrade');
   const solo = A.getAccount(d, actor(d, 'u_solo')).account;
@@ -43,7 +43,7 @@ test('updateProfile changes the display name only', () => {
   assert.equal(A.updateProfile(d, ana, { name: '' }).status, 400);
   assert.equal(A.updateProfile(d, ana, { name: 'x'.repeat(81) }).status, 400);
   assert.equal(A.updateProfile(d, ana, { name: 'Ok', email: 'hacker@x.test', role: 'superadmin' }).ok, true);
-  assert.equal(d.users.find(u => u.id === 'u_bl_ana').email, 'ana@brightloom.test');
+  assert.equal(d.users.find(u => u.id === 'u_bl_ana').email, 'ana@agentflow.com');
   assert.equal(d.users.find(u => u.id === 'u_bl_ana').role, 'employee');
 });
 

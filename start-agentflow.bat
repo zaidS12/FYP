@@ -14,7 +14,7 @@ if errorlevel 1 (
 
 if "%PORT%"=="" set PORT=3000
 echo Starting AgentFlow on http://localhost:%PORT% ...
-echo Sign in with a demo account from README.md, for example super@agentflow.test / AgentFlow#2026
+echo Sign in with a demo account from README.md, for example super@agentflow.com / AgentFlow#2026
 echo.
 if not "%AF_NO_BROWSER%"=="1" start "" cmd /c "timeout /t 2 /nobreak >nul & start http://localhost:%PORT%"
 node server.js

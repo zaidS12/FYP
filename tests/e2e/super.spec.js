@@ -7,7 +7,7 @@ test.describe.configure({ mode: 'serial' });
 let companyAdminEmail; let companyAdminPassword;
 
 test('super admin dashboard shows platform numbers and what needs attention', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await expect(page).toHaveURL(/super\/dashboard\.html$/);
   await expect(page.locator('.stat', { hasText: 'Active companies' })).toBeVisible();
   await expect(page.locator('.stat', { hasText: 'Frozen companies' }).locator('b')).toHaveText('1');
@@ -16,7 +16,7 @@ test('super admin dashboard shows platform numbers and what needs attention', as
 });
 
 test('create a company, hand over the temporary password, and the new admin can sign in', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/super/tenants.html');
   await expect(page.getByRole('link', { name: 'Brightloom Studio' })).toBeVisible();
   await page.getByRole('button', { name: 'New company' }).first().click();
@@ -38,7 +38,7 @@ test('create a company, hand over the temporary password, and the new admin can 
 });
 
 test('validation errors explain how to fix the form', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/super/tenants.html');
   await page.getByRole('button', { name: 'New company' }).first().click();
   const dlg = page.getByRole('dialog');
@@ -52,7 +52,7 @@ test('validation errors explain how to fix the form', async ({ page }) => {
 });
 
 test('freeze and unfreeze a company: its admin is told why, then can sign in again', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/super/tenants.html');
   await page.getByRole('link', { name: 'E2E Company' }).click();
   await expect(page.locator('#title')).toHaveText('E2E Company');
@@ -64,7 +64,7 @@ test('freeze and unfreeze a company: its admin is told why, then can sign in aga
   await logout(page);
   await login(page, companyAdminEmail, companyAdminPassword);
   await expect(page.locator('#login-error')).toContainText('E2E Company is frozen');
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/super/tenants.html');
   await page.getByRole('link', { name: 'E2E Company' }).click();
   await page.getByRole('button', { name: 'Unfreeze company' }).click();
@@ -74,7 +74,7 @@ test('freeze and unfreeze a company: its admin is told why, then can sign in aga
 });
 
 test('change plan and seats, add an account, reset its password, freeze and delete it', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/super/tenants.html');
   await page.getByRole('link', { name: 'E2E Company' }).click();
   await page.getByRole('button', { name: 'Change plan or seats' }).click();
@@ -110,7 +110,7 @@ test('change plan and seats, add an account, reset its password, freeze and dele
 });
 
 test('payments and audit pages show money and who did what, with filters', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/super/payments.html');
   await expect(page.locator('.stat.is-bad')).toContainText('Overdue');
   await page.getByLabel('Filter by company').selectOption({ label: 'Kestrel Freight' });
@@ -124,7 +124,7 @@ test('payments and audit pages show money and who did what, with filters', async
 });
 
 test('export the whole database and import it back without losing the sign-in', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export database (JSON)' }).click()]);
   expect(download.suggestedFilename()).toMatch(/^agentflow-database-\d{4}-\d{2}-\d{2}\.json$/);
   const fs = require('node:fs');
@@ -145,7 +145,7 @@ test('export the whole database and import it back without losing the sign-in', 
 });
 
 test('deleting a company needs the exact name typed, then removes it and its people', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   const made = await api(page, 'POST', '/api/tenants', { name: 'Delete Me Co', plan_id: 'basic', admin_name: 'Del Admin', admin_email: 'del@delete-me.test' });
   expect(made.status).toBe(201);
   await page.goto('/super/tenant-detail.html?id=' + made.json.tenant.id);
@@ -165,7 +165,7 @@ test('deleting a company needs the exact name typed, then removes it and its peo
 });
 
 test('dialogs trap focus and give it back when they close', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/super/tenants.html');
   const opener = page.getByRole('button', { name: 'New company' }).first();
   await opener.focus(); await opener.press('Enter');
@@ -179,7 +179,7 @@ test('dialogs trap focus and give it back when they close', async ({ page }) => 
 });
 
 test('a bad import file is rejected with a clear message', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   const [chooser] = await Promise.all([page.waitForEvent('filechooser'), page.getByRole('button', { name: 'Import database (JSON)' }).click()]);
   await chooser.setFiles({ name: 'nope.json', mimeType: 'application/json', buffer: Buffer.from('{"format":"something-else"}') });
   const dlg = page.getByRole('dialog');
@@ -189,11 +189,11 @@ test('a bad import file is rejected with a clear message', async ({ page }) => {
 });
 
 test('company admins and employees cannot open super admin pages', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await page.goto('/super/dashboard.html');
   await expect(page).toHaveURL(/app\/flows\.html$/);
   await logout(page);
-  await loginOk(page, 'admin@brightloom.test');
+  await loginOk(page, 'admin@agentflow.com');
   await page.goto('/super/tenants.html');
   await expect(page).toHaveURL(/admin\/dashboard\.html$/);
 });

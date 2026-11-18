@@ -111,7 +111,7 @@ Resume in a new chat by reading `docs/BUILD_SPEC.md` (the full brief), `docs/PLA
 - Review (fresh context): no critical/high. Fixed: repeated Stop requests no longer grow the log. Accepted for the demo: runs/runSteps are never pruned and each
   step rewrites db.json synchronously (add retention + debounced saves in phase 11).
 - Verified: 215 unit tests, 61 Playwright e2e tests (new `tests/e2e/runs.spec.js`: refuse-with-problems, run, history, details, search; privacy across employee,
-  company admin, other tenant and super admin). Note: Kestrel Freight is frozen in the seed, so use `solo@example.test` as the outsider in e2e.
+  company admin, other tenant and super admin). Note: Kestrel Freight is frozen in the seed, so use `solo@example.com` as the outsider in e2e.
 
 ## Phase 5 review + Phase 6 – builder canvas and node registry — DONE, STOPPED FOR OWNER REVIEW OF THE CANVAS
 - Independent review of phases 5+6 (it read the services, routes and the first part of builder.js, not canvas/engine/tests). Fixed: `base_version` is now

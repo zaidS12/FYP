@@ -59,7 +59,7 @@ test('createTenant validates name, plan and admin details and does not leave par
   assert.equal(T.createTenant(d, sa, { name: 'X Co', plan_id: 'free', admin_name: 'A', admin_email: 'a@x.test' }).status, 400);
   assert.equal(T.createTenant(d, sa, { name: 'X Co', plan_id: 'basic', admin_name: 'A', admin_email: 'bad' }).status, 400);
   assert.equal(T.createTenant(d, sa, { name: 'Brightloom Studio', plan_id: 'basic', admin_name: 'A', admin_email: 'a@x.test' }).status, 409);
-  assert.equal(T.createTenant(d, sa, { name: 'X Co', plan_id: 'basic', admin_name: 'A', admin_email: 'ana@brightloom.test' }).status, 409);
+  assert.equal(T.createTenant(d, sa, { name: 'X Co', plan_id: 'basic', admin_name: 'A', admin_email: 'ana@agentflow.com' }).status, 409);
   assert.equal(JSON.stringify(d), before, 'failed creates must not change data');
 });
 

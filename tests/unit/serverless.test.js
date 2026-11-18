@@ -53,7 +53,7 @@ async function instance(remote, extraEnv) {
   return { call, close: () => new Promise(r => { server.closeAllConnections && server.closeAllConnections(); server.close(r); }) };
 }
 const login = async (inst, ip) => {
-  const r = await inst.call('/api/auth/login', { method: 'POST', body: { email: 'ana@brightloom.test', password: 'AgentFlow#2026' }, ip });
+  const r = await inst.call('/api/auth/login', { method: 'POST', body: { email: 'ana@agentflow.com', password: 'AgentFlow#2026' }, ip });
   return (r.headers.get('set-cookie') || '').split(';')[0];
 };
 
@@ -139,7 +139,7 @@ test('CO-WORK across instances: a card locked on one instance is locked for the 
   const remote = fakeRemote(); const a = await instance(remote); const b = await instance(remote);
   try {
     const ana = await login(a, '10.0.6.1');
-    const omarRes = await b.call('/api/auth/login', { method: 'POST', body: { email: 'omar@brightloom.test', password: 'AgentFlow#2026' }, ip: '10.0.6.2' });
+    const omarRes = await b.call('/api/auth/login', { method: 'POST', body: { email: 'omar@agentflow.com', password: 'AgentFlow#2026' }, ip: '10.0.6.2' });
     const omar = (omarRes.headers.get('set-cookie') || '').split(';')[0];
     await a.call('/api/flows/f_news/collab/heartbeat', { method: 'POST', cookie: ana, body: { client_id: 'ana-tab-aaaa' } });
     assert.equal((await a.call('/api/flows/f_news/collab/lock', { method: 'POST', cookie: ana, body: { client_id: 'ana-tab-aaaa', node_id: 'n2' } })).status, 200);

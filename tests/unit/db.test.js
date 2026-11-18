@@ -17,17 +17,17 @@ function backend() {
 
 test('local backend logs in a seeded employee and never exposes the hash', async () => {
   const b = backend();
-  const r = await b.login({ email: 'ana@brightloom.test', password: PW });
+  const r = await b.login({ email: 'ana@agentflow.com', password: PW });
   assert.equal(r.ok, true);
   assert.equal(r.user.role, 'employee');
   assert.equal('password_hash' in r.user, false);
   const me = await b.me();
-  assert.equal(me.user.email, 'ana@brightloom.test');
+  assert.equal(me.user.email, 'ana@agentflow.com');
 });
 
 test('wrong password and unknown email give the same generic error', async () => {
   const b = backend();
-  const a = await b.login({ email: 'ana@brightloom.test', password: 'nope-nope1' });
+  const a = await b.login({ email: 'ana@agentflow.com', password: 'nope-nope1' });
   const c = await b.login({ email: 'ghost@nowhere.test', password: 'nope-nope1' });
   assert.equal(a.ok, false); assert.equal(c.ok, false);
   assert.equal(a.status, 401);
@@ -36,17 +36,17 @@ test('wrong password and unknown email give the same generic error', async () =>
 
 test('frozen company and frozen user are refused with a clear reason', async () => {
   const b = backend();
-  const t = await b.login({ email: 'admin@kestrel.test', password: PW });
+  const t = await b.login({ email: 'admin@kestrel.com', password: PW });
   assert.equal(t.status, 403);
   assert.match(t.error, /Kestrel Freight/);
-  const u = await b.login({ email: 'dev.frozen@brightloom.test', password: PW });
+  const u = await b.login({ email: 'dev.frozen@agentflow.com', password: PW });
   assert.equal(u.status, 403);
   assert.match(u.error, /frozen/i);
 });
 
 test('login records a device and a login event with parsed browser/os', async () => {
   const b = backend();
-  await b.login({ email: 'ana@brightloom.test', password: PW });
+  await b.login({ email: 'ana@agentflow.com', password: PW });
   const snap = b._snapshot();
   const ev = snap.loginEvents[snap.loginEvents.length - 1];
   assert.equal(ev.success, true);
@@ -57,12 +57,12 @@ test('login records a device and a login event with parsed browser/os', async ()
 
 test('register creates a free individual, logs in, and rejects duplicates', async () => {
   const b = backend();
-  const r = await b.register({ name: 'New Person', email: 'New.Person@Example.test', password: 'Password1' });
+  const r = await b.register({ name: 'New Person', email: 'New.Person@Example.com', password: 'Password1' });
   assert.equal(r.ok, true);
   assert.equal(r.user.role, 'individual');
   assert.equal(r.user.tenant_id, null);
-  assert.equal(r.user.email, 'new.person@example.test');
-  const dup = await b.register({ name: 'Again', email: 'new.person@example.test', password: 'Password1' });
+  assert.equal(r.user.email, 'new.person@example.com');
+  const dup = await b.register({ name: 'Again', email: 'new.person@example.com', password: 'Password1' });
   assert.equal(dup.status, 409);
   const bad = await b.register({ name: '', email: 'x', password: '1' });
   assert.equal(bad.status, 400);
@@ -71,25 +71,25 @@ test('register creates a free individual, logs in, and rejects duplicates', asyn
 
 test('flows are tenant scoped: employee sees company flows, individual sees only own, others never', async () => {
   const b = backend();
-  await b.login({ email: 'ana@brightloom.test', password: PW });
+  await b.login({ email: 'ana@agentflow.com', password: PW });
   const mine = (await b.listFlows()).flows;
   assert.ok(mine.length >= 2);
   assert.ok(mine.every(f => f.tenant_id === 't_brightloom'));
   assert.ok(!mine.some(f => f.name === 'Translate announcement to Urdu'), 'private flow of a colleague must be hidden');
   await b.logout();
   assert.equal((await b.listFlows()).status, 401);
-  await b.login({ email: 'solo@example.test', password: PW });
+  await b.login({ email: 'solo@example.com', password: PW });
   const solo = (await b.listFlows()).flows;
   assert.ok(solo.every(f => f.tenant_id === null));
   await b.logout();
-  await b.login({ email: 'super@agentflow.test', password: PW });
+  await b.login({ email: 'super@agentflow.com', password: PW });
   const all = (await b.listFlows()).flows;
   assert.ok(new Set(all.map(f => f.tenant_id)).size >= 3);
 });
 
 test('theme preference is saved per user and validated', async () => {
   const b = backend();
-  await b.login({ email: 'ana@brightloom.test', password: PW });
+  await b.login({ email: 'ana@agentflow.com', password: PW });
   assert.equal((await b.setPrefs({ theme: 'dark' })).ok, true);
   assert.equal((await b.me()).user.prefs.theme, 'dark');
   assert.equal((await b.setPrefs({ theme: 'neon' })).status, 400);
@@ -97,7 +97,7 @@ test('theme preference is saved per user and validated', async () => {
 
 test('logout clears the session', async () => {
   const b = backend();
-  await b.login({ email: 'ana@brightloom.test', password: PW });
+  await b.login({ email: 'ana@agentflow.com', password: PW });
   await b.logout();
   assert.equal((await b.me()).ok, false);
 });

@@ -50,17 +50,17 @@ function build(hash) {
     id, tenant_id, role, name, email, password_hash: pw, status, prefs: { theme: 'light' }, created_at: iso(createdAgo), created_by: null,
   });
   const users = [
-    mk('u_super', null, 'superadmin', 'Platform Admin', 'super@agentflow.test', 'active', 120 * DAY),
-    mk('u_bl_admin', 't_brightloom', 'admin', 'Maya Hussain', 'admin@brightloom.test', 'active', 90 * DAY),
-    mk('u_bl_ana', 't_brightloom', 'employee', 'Ana Torres', 'ana@brightloom.test', 'active', 80 * DAY),
-    mk('u_bl_omar', 't_brightloom', 'employee', 'Omar Siddiqui', 'omar@brightloom.test', 'active', 70 * DAY),
-    mk('u_bl_lina', 't_brightloom', 'employee', 'Lina Park', 'lina@brightloom.test', 'active', 55 * DAY),
-    mk('u_bl_raj', 't_brightloom', 'employee', 'Raj Menon', 'raj@brightloom.test', 'active', 40 * DAY),
-    mk('u_bl_devon', 't_brightloom', 'employee', 'Devon Clarke', 'dev.frozen@brightloom.test', 'frozen', 35 * DAY),
-    mk('u_ke_admin', 't_kestrel', 'admin', 'Idris Kestrel', 'admin@kestrel.test', 'active', 60 * DAY),
-    mk('u_ke_sam', 't_kestrel', 'employee', 'Sam Okafor', 'sam@kestrel.test', 'active', 50 * DAY),
-    mk('u_ke_noor', 't_kestrel', 'employee', 'Noor Fatima', 'noor@kestrel.test', 'active', 45 * DAY),
-    mk('u_solo', null, 'individual', 'Sol Individual', 'solo@example.test', 'active', 20 * DAY),
+    mk('u_super', null, 'superadmin', 'Platform Admin', 'super@agentflow.com', 'active', 120 * DAY),
+    mk('u_bl_admin', 't_brightloom', 'admin', 'Maya Hussain', 'admin@agentflow.com', 'active', 90 * DAY),
+    mk('u_bl_ana', 't_brightloom', 'employee', 'Ana Torres', 'ana@agentflow.com', 'active', 80 * DAY),
+    mk('u_bl_omar', 't_brightloom', 'employee', 'Omar Siddiqui', 'omar@agentflow.com', 'active', 70 * DAY),
+    mk('u_bl_lina', 't_brightloom', 'employee', 'Lina Park', 'lina@agentflow.com', 'active', 55 * DAY),
+    mk('u_bl_raj', 't_brightloom', 'employee', 'Raj Menon', 'raj@agentflow.com', 'active', 40 * DAY),
+    mk('u_bl_devon', 't_brightloom', 'employee', 'Devon Clarke', 'dev.frozen@agentflow.com', 'frozen', 35 * DAY),
+    mk('u_ke_admin', 't_kestrel', 'admin', 'Idris Kestrel', 'admin@kestrel.com', 'active', 60 * DAY),
+    mk('u_ke_sam', 't_kestrel', 'employee', 'Sam Okafor', 'sam@kestrel.com', 'active', 50 * DAY),
+    mk('u_ke_noor', 't_kestrel', 'employee', 'Noor Fatima', 'noor@kestrel.com', 'active', 45 * DAY),
+    mk('u_solo', null, 'individual', 'Sol Individual', 'solo@example.com', 'active', 20 * DAY),
   ];
   users.filter(u => u.role === 'individual').forEach(u => { u.plan_id = 'free'; });
   users.forEach(u => { if (u.tenant_id && u.role === 'employee') u.created_by = u.tenant_id === 't_brightloom' ? 'u_bl_admin' : 'u_ke_admin'; });
@@ -81,10 +81,10 @@ function build(hash) {
 
   const defs = {
     f_news: { tenant: 't_brightloom', owner: 'u_bl_ana', name: 'Daily AI news digest', shared: true,
-      nodes: [N('n1', 'start', 'Start', 80, 160), N('n2', 'search_web', 'Find AI news', 320, 160, { query: 'latest AI news', max_results: 5 }), N('n3', 'summarize', 'Summarize', 560, 160, { style: 'bullets', max_words: 120 }), N('n4', 'write_email', 'Email me', 800, 160, { to: 'team@brightloom.test', subject: 'Your AI news digest', tone: 'friendly' }), N('n5', 'end', 'End', 1040, 160)],
+      nodes: [N('n1', 'start', 'Start', 80, 160), N('n2', 'search_web', 'Find AI news', 320, 160, { query: 'latest AI news', max_results: 5 }), N('n3', 'summarize', 'Summarize', 560, 160, { style: 'bullets', max_words: 120 }), N('n4', 'write_email', 'Email me', 800, 160, { to: 'team@agentflow.com', subject: 'Your AI news digest', tone: 'friendly' }), N('n5', 'end', 'End', 1040, 160)],
       edges: [E('e1', 'n1', 'n2'), E('e2', 'n2', 'n3'), E('e3', 'n3', 'n4'), E('e4', 'n4', 'n5')] },
     f_report: { tenant: 't_brightloom', owner: 'u_bl_omar', name: 'Competitor research report', shared: true,
-      nodes: [N('n1', 'start', 'Start', 60, 200), N('n2', 'research_bot', 'Research competitors', 290, 200, { topic: 'competitor pricing', depth: 'standard' }), N('n3', 'create_report', 'Build report', 530, 200, { format: 'markdown', sections: 'Summary, Findings, Risks' }), N('n4', 'condition', 'Report ready?', 770, 200, { expression: 'length > 200' }), N('n5', 'write_email', 'Send report', 1010, 110, { to: 'omar@brightloom.test', subject: 'Competitor report', tone: 'formal' }), N('n6', 'end', 'Done', 1250, 110), N('n7', 'end', 'Stop (too short)', 1010, 300)],
+      nodes: [N('n1', 'start', 'Start', 60, 200), N('n2', 'research_bot', 'Research competitors', 290, 200, { topic: 'competitor pricing', depth: 'standard' }), N('n3', 'create_report', 'Build report', 530, 200, { format: 'markdown', sections: 'Summary, Findings, Risks' }), N('n4', 'condition', 'Report ready?', 770, 200, { expression: 'length > 200' }), N('n5', 'write_email', 'Send report', 1010, 110, { to: 'omar@agentflow.com', subject: 'Competitor report', tone: 'formal' }), N('n6', 'end', 'Done', 1250, 110), N('n7', 'end', 'Stop (too short)', 1010, 300)],
       edges: [E('e1', 'n1', 'n2'), E('e2', 'n2', 'n3'), E('e3', 'n3', 'n4'), E('e4', 'n4', 'n5', 'yes'), E('e5', 'n4', 'n7', 'no'), E('e6', 'n5', 'n6')] },
     f_translate: { tenant: 't_brightloom', owner: 'u_bl_lina', name: 'Translate announcement to Urdu', shared: false,
       nodes: [N('n1', 'start', 'Start', 80, 140), N('n2', 'translate', 'To Urdu', 330, 140, { target_language: 'Urdu' }), N('n3', 'end', 'End', 580, 140)],

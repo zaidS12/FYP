@@ -53,12 +53,12 @@ Password for **every** account: `AgentFlow#2026` (demo data only).
 
 | Role | Email | Notes |
 |---|---|---|
-| Super Admin | super@agentflow.test | Sees every company, can "Login as" any admin or employee |
-| Company Admin | admin@brightloom.test | Brightloom Studio, Basic plan, 6 of 10 seats used |
-| Employee | ana@brightloom.test | Brightloom; also omar@, lina@, raj@brightloom.test |
-| Frozen employee | dev.frozen@brightloom.test | Cannot sign in, shows a clear message |
-| Company Admin (frozen company) | admin@kestrel.test | Kestrel Freight is frozen; sam@ and noor@kestrel.test too |
-| Individual (free) | solo@example.test | 100 credits/month, personal flows only |
+| Super Admin | super@agentflow.com | Sees every company, can "Login as" any admin or employee |
+| Company Admin | admin@agentflow.com | Brightloom Studio, Basic plan, 6 of 10 seats used |
+| Employee | ana@agentflow.com | Brightloom; also omar@, lina@, raj@agentflow.com |
+| Frozen employee | dev.frozen@agentflow.com | Cannot sign in, shows a clear message |
+| Company Admin (frozen company) | admin@kestrel.com | Kestrel Freight is frozen; sam@ and noor@kestrel.com too |
+| Individual (free) | solo@example.com | 100 credits/month, personal flows only |
 
 Demo checkout card: `4242 4242 4242 4242`, any future date, any 3 digits (`4000 0000 0000 0002` is declined, `4000 0000 0000 9995` has no funds).
 Demo failure for a run: put `[ai-error]` in a card's input text.

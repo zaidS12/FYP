@@ -45,12 +45,12 @@
   });
 
   const accounts = [
-    ['Super Admin', 'super@agentflow.test'],
-    ['Company Admin · Brightloom', 'admin@brightloom.test'],
-    ['Employee · Brightloom', 'ana@brightloom.test'],
-    ['Individual (Free)', 'solo@example.test'],
-    ['Frozen company · Kestrel', 'admin@kestrel.test'],
-    ['Frozen employee · Brightloom', 'dev.frozen@brightloom.test'],
+    ['Super Admin', 'super@agentflow.com'],
+    ['Company Admin · Brightloom', 'admin@agentflow.com'],
+    ['Employee · Brightloom', 'ana@agentflow.com'],
+    ['Individual (Free)', 'solo@example.com'],
+    ['Frozen company · Kestrel', 'admin@kestrel.com'],
+    ['Frozen employee · Brightloom', 'dev.frozen@agentflow.com'],
   ];
   const list = document.getElementById('demo-list');
   accounts.forEach(([label, email]) => {

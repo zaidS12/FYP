@@ -17,7 +17,7 @@ async function fillCard(dlg, number = '4242 4242 4242 4242') {
 }
 
 test('setup: the super admin creates a company for these tests', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   const r = await api(page, 'POST', '/api/tenants', { name: 'Billing Co', plan_id: 'basic', admin_name: 'Bill Admin', admin_email: ADMIN });
   expect(r.status).toBe(201);
   adminPw = r.json.temp_password;
@@ -165,7 +165,7 @@ test('company backup: export downloads this company only, import adds private co
 });
 
 test('employees cannot open admin pages and admins cannot open super admin pages', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   for (const p of ['/admin/employees.html', '/admin/billing.html', '/admin/activity.html', '/admin/dashboard.html']) {
     await page.goto(p);
     await expect(page).toHaveURL(/app\/flows\.html$/);

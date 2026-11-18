@@ -21,9 +21,9 @@ async function exportAs(page, label) {
 }
 
 test('the AI Flow Architect builds an editable flow from a sentence, and it runs', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Architect flow');
-  await page.getByLabel('Describe the flow you want').fill('Find daily AI news and email me a summary to ana@brightloom.test');
+  await page.getByLabel('Describe the flow you want').fill('Find daily AI news and email me a summary to ana@agentflow.com');
   await page.getByRole('button', { name: 'Build it' }).click();
   await expect(page.locator('.cv-node')).toHaveCount(6);
   await expect(page.locator('#settings')).toContainText('Built from your description');
@@ -42,7 +42,7 @@ test('the AI Flow Architect builds an editable flow from a sentence, and it runs
 });
 
 test('the Architect explains what it could not understand, and asks before replacing a flow', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Architect refusals');
   await page.getByLabel('Describe the flow you want').fill('hello there');
   await page.getByRole('button', { name: 'Build it' }).click();
@@ -65,7 +65,7 @@ test('the Architect explains what it could not understand, and asks before repla
 });
 
 test('export as JSON, PNG and PDF; the JSON imports back into a new flow', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Export me');
   await page.getByLabel('Describe the flow you want').fill('Search the web for AI news and summarize it');
   await page.getByRole('button', { name: 'Build it' }).click();
@@ -100,7 +100,7 @@ test('export as JSON, PNG and PDF; the JSON imports back into a new flow', async
 });
 
 test('importing something that is not a flow says what to do instead', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await page.goto('/app/flows.html');
   const bad = test.info().outputPath('not-a-flow.json'); fs.writeFileSync(bad, JSON.stringify({ hello: 'world' }));
   const [chooser] = await Promise.all([page.waitForEvent('filechooser'), page.getByRole('button', { name: 'Import flow (JSON)' }).click()]);
@@ -113,7 +113,7 @@ test('importing something that is not a flow says what to do instead', async ({ 
 });
 
 test('people who can only look cannot use the Architect', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/app/builder.html?id=f_news');
   await page.waitForSelector('.cv-node');
   await expect(page.getByLabel('Describe the flow you want')).toBeDisabled();

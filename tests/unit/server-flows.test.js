@@ -37,7 +37,7 @@ test('every Phase 5 endpoint refuses anonymous callers', async () => {
 });
 
 test('a flow can be created, opened, edited into a new version, duplicated and deleted over HTTP', async () => {
-  const ana = await login('ana@brightloom.test');
+  const ana = await login('ana@agentflow.com');
   const made = await api('/api/flows', { method: 'POST', cookie: ana, body: { name: 'HTTP flow', tenant_id: 't_kestrel' } });
   assert.equal(made.status, 201); assert.equal(made.json.flow.tenant_id, 't_brightloom');
   const id = made.json.flow.id;
@@ -53,26 +53,26 @@ test('a flow can be created, opened, edited into a new version, duplicated and d
   assert.equal(clash.status, 409); assert.equal(clash.json.code, 'conflict'); assert.equal(clash.json.conflicts[0].label, 'Flow name');
   const copy = await api(`/api/flows/${id}/duplicate`, { method: 'POST', cookie: ana, body: {} });
   assert.equal(copy.status, 201); assert.equal(copy.json.flow.name, 'stale (copy)');
-  const omar = await login('omar@brightloom.test');
+  const omar = await login('omar@agentflow.com');
   assert.equal((await api('/api/flows/' + id, { cookie: omar })).status, 404, 'private to Ana');
   assert.equal((await api('/api/flows/' + id, { method: 'DELETE', cookie: ana })).status, 200);
   assert.equal((await api('/api/flows/' + id, { cookie: ana })).status, 404);
 });
 
 test('cross-company: a flow id from another company is invisible and untouchable', async () => {
-  const ana = await login('ana@brightloom.test');
+  const ana = await login('ana@agentflow.com');
   assert.equal((await api('/api/flows/f_ke', { cookie: ana })).status, 404);
   assert.equal((await api('/api/flows/f_ke', { method: 'PATCH', cookie: ana, body: { name: 'x' } })).status, 404);
   assert.equal((await api('/api/flows/f_ke', { method: 'DELETE', cookie: ana })).status, 404);
   assert.equal((await api('/api/flows/f_ke/duplicate', { method: 'POST', cookie: ana, body: {} })).status, 404);
-  const sa = await login('super@agentflow.test');
+  const sa = await login('super@agentflow.com');
   assert.equal((await api('/api/flows/f_ke', { cookie: sa })).status, 200);
   assert.equal((await api('/api/flows/f_ke', { method: 'PATCH', cookie: sa, body: { name: 'x' } })).status, 403);
   assert.equal((await api('/api/flows', { method: 'POST', cookie: sa, body: { name: 'x' } })).status, 403);
 });
 
 test('templates can be listed and cloned into your own workspace', async () => {
-  const solo = await login('solo@example.test');
+  const solo = await login('solo@example.com');
   const list = await api('/api/templates', { cookie: solo });
   assert.equal(list.json.templates.length, 4);
   const clone = await api('/api/templates/tpl_news/clone', { method: 'POST', cookie: solo, body: { name: 'My digest' } });
@@ -81,23 +81,23 @@ test('templates can be listed and cloned into your own workspace', async () => {
 });
 
 test('usage shows company credits for employees and personal credits for individuals', async () => {
-  const ana = (await api('/api/usage', { cookie: await login('ana@brightloom.test') })).json.usage;
-  const solo = (await api('/api/usage', { cookie: await login('solo@example.test') })).json.usage;
+  const ana = (await api('/api/usage', { cookie: await login('ana@agentflow.com') })).json.usage;
+  const solo = (await api('/api/usage', { cookie: await login('solo@example.com') })).json.usage;
   assert.deepEqual([ana.scope, ana.limit], ['company', 5000]); assert.deepEqual([solo.scope, solo.limit], ['personal', 100]);
 });
 
 test('changing your password keeps this device signed in and signs the others out', async () => {
-  const a = await login('raj@brightloom.test'); const b = await login('raj@brightloom.test');
+  const a = await login('raj@agentflow.com'); const b = await login('raj@agentflow.com');
   const r = await api('/api/account/password', { method: 'POST', cookie: a, body: { current: PW, next: 'Brand#New789' } });
   assert.equal(r.status, 200);
   assert.equal((await api('/api/auth/me', { cookie: a })).status, 200);
   assert.equal((await api('/api/auth/me', { cookie: b })).status, 401);
   assert.equal((await api('/api/account/password', { method: 'POST', cookie: a, body: { current: 'wrong', next: 'Another#123' } })).status, 400);
-  assert.ok(await login('raj@brightloom.test', 'Brand#New789'));
+  assert.ok(await login('raj@agentflow.com', 'Brand#New789'));
 });
 
 test('guessing the current password is throttled per account', async () => {
-  const cookie = await login('lina@brightloom.test');
+  const cookie = await login('lina@agentflow.com');
   let last;
   for (let i = 0; i < 7; i++) last = await api('/api/account/password', { method: 'POST', cookie, body: { current: 'wrong-guess-' + i, next: 'Whatever#123' } });
   assert.equal(last.status, 429);
@@ -107,30 +107,30 @@ test('guessing the current password is throttled per account', async () => {
 });
 
 test('over HTTP a name or graph change without base_version is a 400, and sharing alone is fine', async () => {
-  const ana = await login('ana@brightloom.test');
+  const ana = await login('ana@agentflow.com');
   const made = await api('/api/flows', { method: 'POST', cookie: ana, body: { name: 'Version rules' } });
   const id = made.json.flow.id;
   assert.equal((await api('/api/flows/' + id, { method: 'PATCH', cookie: ana, body: { name: 'blind overwrite' } })).status, 400);
   assert.equal((await api('/api/flows/' + id, { method: 'PATCH', cookie: ana, body: { shared: true } })).status, 200);
   assert.equal((await api('/api/flows/' + id, { method: 'PATCH', cookie: ana, body: { name: 'ok', base_version: 1 } })).status, 200);
-  const omar = await login('omar@brightloom.test');
+  const omar = await login('omar@agentflow.com');
   assert.equal((await api('/api/flows/' + id, { method: 'PATCH', cookie: omar, body: { shared: false } })).status, 403, 'a colleague cannot change sharing');
   assert.equal((await api('/api/flows/' + id, { method: 'DELETE', cookie: omar })).status, 403, 'a colleague cannot delete it');
 });
 
 test('an individual upgrades to Plus, then returns to Free; the account shows invoices', async () => {
-  const solo = await login('solo@example.test');
+  const solo = await login('solo@example.com');
   assert.equal((await api('/api/account/plan', { method: 'POST', cookie: solo, body: { plan_id: 'plus', card: { ...GOOD, number: '4000 0000 0000 0002' } } })).status, 402);
   const up = await api('/api/account/plan', { method: 'POST', cookie: solo, body: { plan_id: 'plus', card: GOOD } });
   assert.equal(up.status, 200); assert.equal(up.json.usage.limit, 1000);
   const acct = (await api('/api/account', { cookie: solo })).json.account;
   assert.equal(acct.plan.id, 'plus'); assert.ok(acct.invoices.length === 1 && acct.payments.some(p => p.status === 'succeeded'));
   assert.equal((await api('/api/account/plan', { method: 'POST', cookie: solo, body: { plan_id: 'free' } })).status, 200);
-  assert.equal((await api('/api/account/plan', { method: 'POST', cookie: await login('ana@brightloom.test'), body: { plan_id: 'plus', card: GOOD } })).status, 403);
+  assert.equal((await api('/api/account/plan', { method: 'POST', cookie: await login('ana@agentflow.com'), body: { plan_id: 'plus', card: GOOD } })).status, 403);
 });
 
 test('a declined card is written to disk (payment + audit), not only to memory', async () => {
-  const admin = await login('admin@brightloom.test');
+  const admin = await login('admin@agentflow.com');
   const r = await api('/api/billing/seats', { method: 'POST', cookie: admin, body: { count: 1, card: { ...GOOD, number: '4000 0000 0000 0002' } } });
   assert.equal(r.status, 402);
   const onDisk = JSON.parse(fs.readFileSync(srv.store.file, 'utf8'));
@@ -140,7 +140,7 @@ test('a declined card is written to disk (payment + audit), not only to memory',
 });
 
 test('a frozen company cannot buy seats, change plan or pay invoices', async () => {
-  const admin = await login('admin@brightloom.test');
+  const admin = await login('admin@agentflow.com');
   srv.store.data.tenants.find(t => t.id === 't_brightloom').status = 'frozen';
   try {
     assert.equal((await api('/api/billing/seats', { method: 'POST', cookie: admin, body: { count: 1, card: GOOD } })).status, 401, 'frozen sessions are rejected before billing is reached');

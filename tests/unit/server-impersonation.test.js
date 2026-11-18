@@ -37,12 +37,12 @@ test('impersonation endpoints refuse anonymous callers', async () => {
 });
 
 test('employees and individuals cannot start impersonation', async () => {
-  assert.equal((await start(await login('ana@brightloom.test'), 'u_bl_omar')).status, 403);
-  assert.equal((await start(await login('solo@example.test'), 'u_bl_ana')).status, 403);
+  assert.equal((await start(await login('ana@agentflow.com'), 'u_bl_omar')).status, 403);
+  assert.equal((await start(await login('solo@example.com'), 'u_bl_ana')).status, 403);
 });
 
 test('super admin enters an employee: me/permissions follow the subject, passwords never appear', async () => {
-  const sa = await login('super@agentflow.test');
+  const sa = await login('super@agentflow.com');
   const r = await start(sa, 'u_bl_ana');
   assert.equal(r.status, 200); assert.equal(r.json.user.id, 'u_bl_ana');
   const me = await api('/api/auth/me', { cookie: sa });
@@ -58,19 +58,19 @@ test('super admin enters an employee: me/permissions follow the subject, passwor
 });
 
 test('while impersonating: no chaining, cannot change subject password or email, theme is not persisted', async () => {
-  const sa = await login('super@agentflow.test');
+  const sa = await login('super@agentflow.com');
   await start(sa, 'u_bl_admin');
   assert.equal((await start(sa, 'u_bl_ana')).status, 403, 'no chained impersonation');
   assert.equal((await api('/api/account/password', { method: 'POST', cookie: sa, body: { current: PW, next: 'Another#2026x' } })).status, 403);
-  assert.equal((await api('/api/users/u_bl_admin', { method: 'PATCH', cookie: sa, body: { email: 'x@brightloom.test' } })).status, 403);
+  assert.equal((await api('/api/users/u_bl_admin', { method: 'PATCH', cookie: sa, body: { email: 'x@agentflow.com' } })).status, 403);
   assert.equal((await api('/api/users/u_bl_admin/reset-password', { method: 'POST', cookie: sa, body: {} })).status, 403);
   await api('/api/auth/prefs', { method: 'PATCH', cookie: sa, body: { theme: 'dark' } });
   assert.notEqual(srv.store.data.users.find(u => u.id === 'u_bl_admin').prefs.theme, 'dark');
-  assert.equal((await login('admin@brightloom.test')) !== '', true, 'subject password unchanged');
+  assert.equal((await login('admin@agentflow.com')) !== '', true, 'subject password unchanged');
 });
 
 test('writes during impersonation are audited as "<actor> acting as <subject>", versions and runs show by', async () => {
-  const sa = await login('super@agentflow.test');
+  const sa = await login('super@agentflow.com');
   await start(sa, 'u_bl_ana');
   const created = await api('/api/flows', { method: 'POST', cookie: sa, body: { name: 'Made by support' } });
   assert.equal(created.status, 201);
@@ -83,7 +83,7 @@ test('writes during impersonation are audited as "<actor> acting as <subject>", 
 });
 
 test('credits are charged to the subject company and the run records who really started it', async () => {
-  const sa = await login('super@agentflow.test');
+  const sa = await login('super@agentflow.com');
   await start(sa, 'u_bl_ana');
   const before = (await api('/api/usage', { cookie: sa })).json.usage.used;
   const started = await api('/api/flows/f_news/runs', { method: 'POST', cookie: sa, body: {} });
@@ -93,7 +93,7 @@ test('credits are charged to the subject company and the run records who really 
 });
 
 test('return ends it: audit entries exist, subject device and sign-in lists stay clean, access log shows it', async () => {
-  const sa = await login('super@agentflow.test');
+  const sa = await login('super@agentflow.com');
   const devs = srv.store.data.devices.filter(d => d.user_id === 'u_bl_lina').length;
   const events = srv.store.data.loginEvents.filter(e => e.user_id === 'u_bl_lina').length;
   assert.equal((await start(sa, 'u_bl_lina')).status, 200);
@@ -105,13 +105,13 @@ test('return ends it: audit entries exist, subject device and sign-in lists stay
   assert.ok(started && ended); assert.equal(started.actor_id, 'u_super'); assert.equal(started.meta.browser, 'Chrome 120'); assert.ok(started.meta.ip);
   assert.equal(srv.store.data.devices.filter(d => d.user_id === 'u_bl_lina').length, devs);
   assert.equal(srv.store.data.loginEvents.filter(e => e.user_id === 'u_bl_lina').length, events);
-  const lina = await login('lina@brightloom.test');
+  const lina = await login('lina@agentflow.com');
   const act = (await api('/api/account/activity', { cookie: lina })).json;
   assert.ok(act.access.some(a => a.action === 'impersonation.started'));
 });
 
 test('admin: own employees only; other company, admins, frozen employee and super admin are refused', async () => {
-  const ad = await login('admin@brightloom.test');
+  const ad = await login('admin@agentflow.com');
   for (const id of ['u_ke_sam', 'u_bl_admin', 'u_super', 'u_bl_devon', 'no_such_user']) assert.ok([403, 404].includes((await start(ad, id)).status), id);
   assert.equal((await start(ad, 'u_ke_sam')).status, 403);
   assert.ok(audit().some(e => e.action === 'security.cross_tenant_attempt' && e.meta.op === 'impersonate'));
@@ -122,7 +122,7 @@ test('admin: own employees only; other company, admins, frozen employee and supe
 });
 
 test('super admin may inspect a frozen employee, flagged; admin may not; refusal on a company that is frozen', async () => {
-  const sa = await login('super@agentflow.test');
+  const sa = await login('super@agentflow.com');
   const r = await start(sa, 'u_bl_devon');
   assert.equal(r.status, 200);
   const me = await api('/api/auth/me', { cookie: sa });
@@ -130,7 +130,7 @@ test('super admin may inspect a frozen employee, flagged; admin may not; refusal
 });
 
 test('the right is re-checked on every request: freezing the subject ends an admin session; expiry ends it too', async () => {
-  const ad = await login('admin@brightloom.test');
+  const ad = await login('admin@agentflow.com');
   assert.equal((await start(ad, 'u_bl_omar')).status, 200);
   srv.store.data.users.find(u => u.id === 'u_bl_omar').status = 'frozen';
   const me = await api('/api/auth/me', { cookie: ad });
@@ -144,7 +144,7 @@ test('the right is re-checked on every request: freezing the subject ends an adm
 });
 
 test('signing out while impersonating ends the session and audits it', async () => {
-  const sa = await login('super@agentflow.test');
+  const sa = await login('super@agentflow.com');
   await start(sa, 'u_bl_raj');
   assert.equal((await api('/api/auth/logout', { method: 'POST', cookie: sa, body: {} })).status, 200);
   assert.equal((await api('/api/auth/me', { cookie: sa })).status, 401);
@@ -152,12 +152,12 @@ test('signing out while impersonating ends the session and audits it', async () 
 });
 
 test('SECURITY: nobody can reset their own password or change their own email without the current password; sessions per person are capped', async () => {
-  const ad = await login('admin@brightloom.test');
+  const ad = await login('admin@agentflow.com');
   assert.equal((await api('/api/users/u_bl_admin/reset-password', { method: 'POST', cookie: ad, body: { password: 'Hacked#12345' } })).status, 403);
-  assert.equal((await api('/api/users/u_bl_admin', { method: 'PATCH', cookie: ad, body: { email: 'new@brightloom.test' } })).status, 403);
+  assert.equal((await api('/api/users/u_bl_admin', { method: 'PATCH', cookie: ad, body: { email: 'new@agentflow.com' } })).status, 403);
   assert.equal((await api('/api/users/u_bl_admin', { method: 'PATCH', cookie: ad, body: { name: 'Maya H.' } })).status, 200, 'other self-edits still work');
-  const sa = await login('super@agentflow.test');
+  const sa = await login('super@agentflow.com');
   assert.equal((await api('/api/users/u_super/reset-password', { method: 'POST', cookie: sa, body: { password: 'Hacked#12345' } })).status, 403);
-  for (let i = 0; i < 14; i++) await login('lina@brightloom.test');
+  for (let i = 0; i < 14; i++) await login('lina@agentflow.com');
   assert.ok(srv.store.data.sessions.filter(s => s.user_id === 'u_bl_lina').length <= 10, 'oldest sign-ins make room');
 });

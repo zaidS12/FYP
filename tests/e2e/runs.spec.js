@@ -14,7 +14,7 @@ async function openNew(page, name) {
 }
 
 test('running a flow in the builder shows the result, and the run is kept in history', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await openNew(page, 'Run walkthrough');
   await page.getByRole('button', { name: /^Add Summarize card/ }).click();
   await expect(page.locator('.cv-node')).toHaveCount(3);
@@ -41,7 +41,7 @@ test('running a flow in the builder shows the result, and the run is kept in his
 });
 
 test('a run is private to its owner and company admin; other companies and super admins cannot touch it', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   const flows = await api(page, 'GET', '/api/flows');
   const flow = flows.json.flows.find(f => f.name === 'Run walkthrough');
   const started = await api(page, 'POST', `/api/flows/${flow.id}/runs`, {});
@@ -53,9 +53,9 @@ test('a run is private to its owner and company admin; other companies and super
     await page.context().clearCookies(); await loginOk(page, email);
     expect((await api(page, method, url, method === 'POST' ? {} : undefined)).status).toBe(status);
   };
-  await check('solo@example.test', 'GET', `/api/runs/${runId}`, 404);
-  await check('solo@example.test', 'POST', `/api/flows/${flow.id}/runs`, 404);
-  await check('omar@brightloom.test', 'GET', `/api/runs/${runId}`, 404);
-  await check('admin@brightloom.test', 'GET', `/api/runs/${runId}`, 200);
-  await check('super@agentflow.test', 'POST', `/api/flows/${flow.id}/runs`, 403);
+  await check('solo@example.com', 'GET', `/api/runs/${runId}`, 404);
+  await check('solo@example.com', 'POST', `/api/flows/${flow.id}/runs`, 404);
+  await check('omar@agentflow.com', 'GET', `/api/runs/${runId}`, 404);
+  await check('admin@agentflow.com', 'GET', `/api/runs/${runId}`, 200);
+  await check('super@agentflow.com', 'POST', `/api/flows/${flow.id}/runs`, 403);
 });

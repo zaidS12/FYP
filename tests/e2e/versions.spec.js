@@ -5,7 +5,7 @@ const { loginOk, api } = require('./helpers');
 test.describe.configure({ mode: 'serial' });
 
 test('history lists versions, restore makes a new version and keeps the old ones', async ({ page }) => {
-  await loginOk(page, 'ana@brightloom.test');
+  await loginOk(page, 'ana@agentflow.com');
   await page.goto('/app/flows.html');
   await page.getByRole('button', { name: 'New flow' }).click();
   await page.getByRole('dialog').getByLabel('Flow name').fill('Restore walkthrough');
@@ -40,7 +40,7 @@ test('history lists versions, restore makes a new version and keeps the old ones
 });
 
 test('a save made while signed in as someone else shows who really did it', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   expect((await api(page, 'POST', '/api/impersonation/start', { user_id: 'u_bl_ana' })).status).toBe(200);
   const made = await api(page, 'POST', '/api/flows', { name: 'Support edit' });
   const id = made.json.flow.id;
@@ -55,7 +55,7 @@ test('a save made while signed in as someone else shows who really did it', asyn
 });
 
 test('people who can only look cannot restore', async ({ page }) => {
-  await loginOk(page, 'super@agentflow.test');
+  await loginOk(page, 'super@agentflow.com');
   await page.goto('/app/builder.html?id=f_news');
   await page.waitForSelector('.cv-node');
   await page.getByRole('button', { name: 'History' }).click();

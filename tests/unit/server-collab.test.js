@@ -54,17 +54,17 @@ async function openStream(cookie, flowId, client) {
 }
 
 test('collab endpoints need sign-in and the flow must be visible to you', async () => {
-  const ana = await login('ana@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const f = await sharedFlow(ana);
   assert.equal((await api(`/api/flows/${f.id}/collab`)).status, 401);
   assert.equal((await api(`/api/flows/${f.id}/events?client=abcdef`)).status, 401);
-  const sam = await login('solo@example.test');
+  const sam = await login('solo@example.com');
   assert.equal((await api(`/api/flows/${f.id}/collab`, { cookie: sam })).status, 404);
   assert.equal((await post(sam, `/api/flows/${f.id}/collab/heartbeat`, { client_id: 'solotab01' })).status, 404);
   assert.equal((await post(ana, `/api/flows/${f.id}/collab/heartbeat`, { client_id: 'x' })).status, 400, 'client id must look like an id');
 });
 
 test('presence: two colleagues see each other and the card each is on; leaving removes them', async () => {
-  const ana = await login('ana@brightloom.test'); const omar = await login('omar@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const omar = await login('omar@agentflow.com'); const f = await sharedFlow(ana);
   await post(ana, `/api/flows/${f.id}/collab/heartbeat`, { client_id: 'ana-tab-1', node_id: 'n3' });
   const r = await post(omar, `/api/flows/${f.id}/collab/heartbeat`, { client_id: 'omar-tab-1' });
   assert.deepEqual(r.json.presence.map(p => p.name).sort(), ['Ana Torres', 'Omar Siddiqui']);
@@ -74,7 +74,7 @@ test('presence: two colleagues see each other and the card each is on; leaving r
 });
 
 test('locks: one editor per card; the saves of others on that card are refused, other cards still save and merge', async () => {
-  const ana = await login('ana@brightloom.test'); const omar = await login('omar@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const omar = await login('omar@agentflow.com'); const f = await sharedFlow(ana);
   assert.equal((await post(ana, `/api/flows/${f.id}/collab/lock`, { client_id: 'ana-tab-1', node_id: 'n3' })).status, 200);
   const clash = await post(omar, `/api/flows/${f.id}/collab/lock`, { client_id: 'omar-tab-1', node_id: 'n3' });
   assert.equal(clash.status, 409); assert.match(clash.json.error, /Ana Torres is editing this card/);
@@ -100,19 +100,19 @@ test('locks: one editor per card; the saves of others on that card are refused, 
 });
 
 test('only the holder can unlock; locks vanish when the editor leaves; viewers cannot lock', async () => {
-  const ana = await login('ana@brightloom.test'); const omar = await login('omar@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const omar = await login('omar@agentflow.com'); const f = await sharedFlow(ana);
   await post(ana, `/api/flows/${f.id}/collab/lock`, { client_id: 'ana-tab-1', node_id: 'n3' });
   await post(omar, `/api/flows/${f.id}/collab/unlock`, { client_id: 'omar-tab-1', node_id: 'n3' });
   assert.equal(srv.collab.snapshot(f.id).locks.length, 1);
   await post(ana, `/api/flows/${f.id}/collab/leave`, { client_id: 'ana-tab-1' });
   assert.equal(srv.collab.snapshot(f.id).locks.length, 0);
-  const root = await login('super@agentflow.test');
+  const root = await login('super@agentflow.com');
   assert.equal((await post(root, `/api/flows/${f.id}/collab/lock`, { client_id: 'root-tab-1', node_id: 'n3' })).status, 409, 'the super admin only looks, never locks');
 });
 
 test('impersonation: the lock belongs to the real editor, labelled "Actor (as Subject)", and blocks the subject\'s own tab', async () => {
-  const ana = await login('ana@brightloom.test'); const f = await sharedFlow(ana);
-  const root = await login('super@agentflow.test');
+  const ana = await login('ana@agentflow.com'); const f = await sharedFlow(ana);
+  const root = await login('super@agentflow.com');
   assert.equal((await post(root, '/api/impersonation/start', { user_id: 'u_bl_ana' })).status, 200);
   const l = await post(root, `/api/flows/${f.id}/collab/lock`, { client_id: 'root-tab-1', node_id: 'n3' });
   assert.equal(l.status, 200);
@@ -123,7 +123,7 @@ test('impersonation: the lock belongs to the real editor, labelled "Actor (as Su
 });
 
 test('SSE: a second editor receives presence, lock and version events live', async () => {
-  const ana = await login('ana@brightloom.test'); const omar = await login('omar@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const omar = await login('omar@agentflow.com'); const f = await sharedFlow(ana);
   const s = await openStream(omar, f.id, 'omar-tab-1');
   try {
     await s.waitFor(e => e.event === 'collab');
@@ -139,21 +139,21 @@ test('SSE: a second editor receives presence, lock and version events live', asy
 });
 
 test('SSE refuses people who cannot see the flow', async () => {
-  const ana = await login('ana@brightloom.test'); const f = await sharedFlow(ana);
-  const sam = await login('solo@example.test');
+  const ana = await login('ana@agentflow.com'); const f = await sharedFlow(ana);
+  const sam = await login('solo@example.com');
   const res = await fetch(`${base}/api/flows/${f.id}/events?client=solotab01`, { headers: { Cookie: sam } });
   assert.equal(res.status, 404);
 });
 
 test('restoring an old version is refused while a colleague holds a lock', async () => {
-  const ana = await login('ana@brightloom.test'); const omar = await login('omar@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const omar = await login('omar@agentflow.com'); const f = await sharedFlow(ana);
   await post(omar, `/api/flows/${f.id}/collab/lock`, { client_id: 'omar-tab-1', node_id: 'n4' });
   const r = await post(ana, `/api/flows/${f.id}/versions/1/restore`, { base_version: f.version, client_id: 'ana-tab-1' });
   assert.equal(r.status, 423);
 });
 
 test('a lock is not bypassed by changing connections, nor by borrowing the holder\'s client id', async () => {
-  const ana = await login('ana@brightloom.test'); const omar = await login('omar@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const omar = await login('omar@agentflow.com'); const f = await sharedFlow(ana);
   await post(ana, `/api/flows/${f.id}/collab/lock`, { client_id: 'ana-tab-1', node_id: 'n3' });
   const wired = await api('/api/flows/' + f.id, { method: 'PATCH', cookie: omar, body: { nodes: f.nodes, edges: [...f.edges, { id: 'e99', from: 'n3', fromPort: 'out', to: 'n4', toPort: 'in' }], base_version: f.version, client_id: 'omar-tab-1' } });
   assert.equal(wired.status, 423, 'adding a wire to a locked card is a change to it');
@@ -165,16 +165,16 @@ test('a lock is not bypassed by changing connections, nor by borrowing the holde
 });
 
 test('lock details are only shown to people who can see the flow', async () => {
-  const ana = await login('ana@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const f = await sharedFlow(ana);
   await post(ana, `/api/flows/${f.id}/collab/lock`, { client_id: 'ana-tab-1', node_id: 'n3' });
-  const outsider = await login('solo@example.test');
+  const outsider = await login('solo@example.com');
   const r = await api('/api/flows/' + f.id, { method: 'PATCH', cookie: outsider, body: { nodes: f.nodes, edges: f.edges, base_version: f.version, client_id: 'solo-tab-1' } });
   assert.equal(r.status, 404); assert.equal(r.json.locked, undefined);
   assert.equal((await post(outsider, `/api/flows/${f.id}/versions/1/restore`, { base_version: f.version, client_id: 'solo-tab-1' })).status, 404);
 });
 
 test('two people who both add a card from the same base merge into one flow with both cards', async () => {
-  const ana = await login('ana@brightloom.test'); const omar = await login('omar@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const omar = await login('omar@agentflow.com'); const f = await sharedFlow(ana);
   const add = (id, label) => [...f.nodes, { id, type: 'summarize', label, x: 600, y: 360, config: {} }];
   assert.equal((await api('/api/flows/' + f.id, { method: 'PATCH', cookie: omar, body: { nodes: add('n5', 'Omar card'), edges: f.edges, base_version: f.version, client_id: 'omar-tab-1' } })).status, 200);
   const r = await api('/api/flows/' + f.id, { method: 'PATCH', cookie: ana, body: { nodes: add('n5', 'Ana card'), edges: f.edges, base_version: f.version, client_id: 'ana-tab-1' } });
@@ -183,7 +183,7 @@ test('two people who both add a card from the same base merge into one flow with
 });
 
 test('collab memory is released: no owners or empty maps remain after everyone leaves', async () => {
-  const ana = await login('ana@brightloom.test'); const f = await sharedFlow(ana);
+  const ana = await login('ana@agentflow.com'); const f = await sharedFlow(ana);
   await post(ana, `/api/flows/${f.id}/collab/lock`, { client_id: 'ana-gc-tab', node_id: 'n3' });
   await post(ana, `/api/flows/${f.id}/collab/leave`, { client_id: 'ana-gc-tab' });
   assert.equal(srv.collab.owners.has('ana-gc-tab'), false); assert.equal(srv.collab.locks.has(f.id), false); assert.equal(srv.collab.presence.has(f.id), false);
