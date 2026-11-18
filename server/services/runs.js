@@ -56,7 +56,7 @@ function getRun(data, actor, id) {
   return ok(200, { run: view(data, run, true), steps });
 }
 
-function createRunner({ store, providers, stepDelayMs = 350 }) {
+function createRunner({ store, providers, stepDelayMs = 350, checkStop = null }) {
   const active = new Map();                       // run id -> {promise, userId}
   const db = () => store.data;
   const delay = ms => new Promise(r => setTimeout(r, ms));
@@ -102,7 +102,10 @@ function createRunner({ store, providers, stepDelayMs = 350 }) {
     const findRun = () => db().runs.find(r => r.id === runId);
     const user = () => db().users.find(u => u.id === userId);
     const result = await Engine.run(snapshot, {
-      providers, input, maxSteps: 200, sleep: () => delay(stepDelayMs),
+      providers, input, maxSteps: 200, sleep: async () => {
+        await delay(stepDelayMs);
+        if (checkStop) { try { if (await checkStop(runId)) { const r = findRun(); if (r) r.stop_requested = true; } } catch (e) { /* a failed check must never end a run */ } }   // Stop clicked on another server instance
+      },
       isStopped: () => { const r = findRun(); return !r || r.stop_requested; },
       charge: async (node, cost) => {
         const run = findRun(); const u = user();
@@ -141,10 +144,11 @@ function createRunner({ store, providers, stepDelayMs = 350 }) {
   }
 
   /** Runs that were in progress when the server stopped can never finish: mark them failed. Returns how many. */
-  function recover() {
-    let n = 0;
+  function recover(olderThanMs = 0) {   // serverless: another instance may be running a flow right now, so only touch runs that are clearly abandoned
+    let n = 0; const cutoff = Date.now() - olderThanMs;
     for (const run of db().runs) {
       if (run.status !== 'running' || active.has(run.id)) continue;
+      if (olderThanMs && !(Date.parse(run.started_at) < cutoff)) continue;
       run.status = 'failed'; run.ended_at = iso(); run.error = 'The server restarted while this run was in progress, so it was stopped. Run the flow again.'; run.error_code = 'interrupted'; n += 1;
       for (const s of db().runSteps) if (s.run_id === run.id && s.status === 'running') s.status = 'failed';
     }

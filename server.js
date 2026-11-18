@@ -363,23 +363,23 @@ function createServer(opts = {}) {
   // ---- Phase 7: running flows. The server executes the saved flow, so credits, Stop and history cannot be bypassed from a browser.
   // Real AI / search / mail services replace these three fakes later without touching the runner.
   const providers = opts.providers || { ai: new FakeAIProvider(), search: new FakeSearchProvider(), mail: new FakeMailProvider() };
-  const runner = createRunner({ store, providers, stepDelayMs: opts.stepDelayMs === undefined ? 350 : opts.stepDelayMs });
-  if (runner.recover()) log('marked runs that were interrupted by the last shutdown as failed');
+  const runner = createRunner({ store, providers, stepDelayMs: opts.stepDelayMs === undefined ? 350 : opts.stepDelayMs, checkStop: id => collab.stopRequested(id) });   // checkStop: a Stop clicked on another server instance
+  if (runner.recover(opts.recoverOlderThanMs || 0)) log('marked runs that were interrupted by the last shutdown as failed');
   addRoute('POST', '/api/flows/:id/runs', async (req, res, url, p) => {
     const a = requireAuth(req); const r = runner.start(actorOf(a), p.id, await readJson(req));
-    // Serverless hosts freeze the process once the answer is sent, so a run cannot continue in the background there: finish it first.
-    if (opts.inlineRuns && r.ok) { await runner.whenDone(r.run.id); const done = runner.get(actorOf(a), r.run.id); if (done.ok) return respond(res, { ok: true, status: 202, run: done.run, steps: done.steps }); }
+    // Serverless hosts freeze the process once the answer is sent: keepAlive asks the platform (Vercel waitUntil) to keep it running until the run is done.
+    if (opts.keepAlive && r.ok) opts.keepAlive(runner.whenDone(r.run.id));
     respond(res, r);
   });
   addRoute('GET', '/api/runs', async (req, res, url) => respond(res, runner.list(actorOf(requireAuth(req)), Object.fromEntries(url.searchParams))));
   addRoute('GET', '/api/runs/:id', async (req, res, url, p) => respond(res, runner.get(actorOf(requireAuth(req)), p.id)));
-  addRoute('POST', '/api/runs/:id/stop', async (req, res, url, p) => { const a = requireAuth(req); await readJson(req); respond(res, runner.stop(actorOf(a), p.id)); });
+  addRoute('POST', '/api/runs/:id/stop', async (req, res, url, p) => { const a = requireAuth(req); await readJson(req); const r = runner.stop(actorOf(a), p.id); if (r.ok) await collab.requestStop(p.id); respond(res, r); });
   server_runner = runner;
 
 
   // ---- Phase 9: co-work. Presence and locks live in memory (services/collab.js); events travel over Server-Sent Events,
   // with the same snapshot available by plain GET so a browser can fall back to polling.
-  const collab = new Collab();
+  const collab = opts.collab || new Collab();   // serverless hosts pass a SharedCollab (server/live-sync.js)
   const hub = new Map();   // flowId -> Set of {res, req, clientId}
   const clientIdOf = v => (typeof v === 'string' && /^[A-Za-z0-9_-]{6,64}$/.test(v) ? v : '');
   const MAX_STREAMS_PER_FLOW = 60;
@@ -389,14 +389,14 @@ function createServer(opts = {}) {
     const msg = `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`;
     for (const c of conns) { try { c.res.write(msg); } catch (e) { conns.delete(c); } }
   }
-  const publishCollab = flowId => publish(flowId, 'collab', collab.snapshot(flowId));
+  const publishCollab = flowId => { Promise.resolve(collab.snapshot(flowId)).then(s => publish(flowId, 'collab', s)).catch(() => {}); };
   function publishVersion(flowId, a, version, merged, client) {
     const by = a.by ? `${a.by.name} (as ${a.user.name})` : a.user.name;
     publish(flowId, 'version', { n: version.n, summary: version.summary, by, merged: !!merged, client: client || null, at: new Date().toISOString() });
   }
   const lockMessage = locks => `${[...new Set(locks.map(l => l.label))].join(', ')} ${locks.length === 1 ? 'is' : 'are'} editing cards that this change touches. Ask them to finish, then try again.`;
   /** Cards this save changes that another editor holds a lock on. */
-  function lockedNodesFor(flowId, body, a) {
+  async function lockedNodesFor(flowId, body, a) {
     if (!Array.isArray(body.nodes)) return [];
     const flow = db().flows.find(f => f.id === flowId); if (!flow) return [];
     const baseV = db().flowVersions.find(v => v.flow_id === flowId && v.n === body.base_version);
@@ -405,54 +405,54 @@ function createServer(opts = {}) {
     const baseEdges = baseV ? baseV.snapshot.edges : flow.edges;
     const mineEdges = Array.isArray(body.edges) ? body.edges.filter(e => e && typeof e === 'object') : baseEdges;
     const changed = Merge.changedNodeIds({ nodes: baseNodes, edges: baseEdges }, { nodes: mine, edges: mineEdges });
-    return collab.lockedByOthers(flowId, changed, clientIdOf(body.client_id), (a.by || a.user).id);
+    return await collab.lockedByOthers(flowId, changed, clientIdOf(body.client_id), (a.by || a.user).id);
   }
   const whoOf = (a, clientId, canEditFlow) => { const real = a.by || a.user; return { client_id: clientId, user_id: real.id, name: real.name, as_name: a.by ? a.user.name : null, can_edit: canEditFlow }; };
-  function collabContext(req, flowId, body) {
+  async function collabContext(req, flowId, body) {
     const a = requireAuth(req);
     const f = Flows.getFlow(db(), actorOf(a), flowId);
     if (!f.ok) throw new HttpError(404, 'No such flow.');
     const clientId = clientIdOf(body ? body.client_id : new URL(req.url, 'http://x').searchParams.get('client'));
     if (!clientId) throw new HttpError(400, 'Send a client_id of 6 to 64 letters, digits, - or _.');
-    if (!collab.claim(clientId, (a.by || a.user).id)) throw new HttpError(403, 'That client_id belongs to someone else.');
+    if (!(await collab.claim(clientId, (a.by || a.user).id))) throw new HttpError(403, 'That client_id belongs to someone else.');
     return { a, clientId, who: whoOf(a, clientId, !!f.can_edit), version: f.flow.version };
   }
-  const collabState = (flowId, version) => Object.assign(collab.snapshot(flowId), { version });
+  const collabState = async (flowId, version) => Object.assign(await collab.snapshot(flowId), { version });
   addRoute('GET', '/api/flows/:id/collab', async (req, res, url, p) => {
     const a = requireAuth(req); const f = Flows.getFlow(db(), actorOf(a), p.id);
     if (!f.ok) throw new HttpError(404, 'No such flow.');
-    send(res, 200, collabState(p.id, f.flow.version));
+    send(res, 200, await collabState(p.id, f.flow.version));
   });
   addRoute('POST', '/api/flows/:id/collab/heartbeat', async (req, res, url, p) => {
-    const body = await readJson(req); const c = collabContext(req, p.id, body);
-    const known = collab.snapshot(p.id).presence;
+    const body = await readJson(req); const c = await collabContext(req, p.id, body);
+    const known = (await collab.snapshot(p.id)).presence;
     if (known.length >= MAX_STREAMS_PER_FLOW && !known.some(x => x.client_id === c.clientId)) throw new HttpError(429, 'Too many people are on this flow right now.');
     const nodeId = typeof body.node_id === 'string' ? body.node_id.slice(0, 64) : null;
-    if (collab.heartbeat(p.id, c.who, { node_id: nodeId })) publishCollab(p.id);
-    send(res, 200, collabState(p.id, c.version));
+    if (await collab.heartbeat(p.id, c.who, { node_id: nodeId })) publishCollab(p.id);
+    send(res, 200, await collabState(p.id, c.version));
   });
   addRoute('POST', '/api/flows/:id/collab/lock', async (req, res, url, p) => {
-    const body = await readJson(req); const c = collabContext(req, p.id, body);
+    const body = await readJson(req); const c = await collabContext(req, p.id, body);
     if (typeof body.node_id !== 'string' || !body.node_id || body.node_id.length > 64) throw new HttpError(400, 'Send the card id to lock.');
     const lockFlow = db().flows.find(f => f.id === p.id);
     if (!lockFlow || !lockFlow.nodes.some(n => n.id === body.node_id)) throw new HttpError(404, 'That card is not in this flow.');
-    const r = collab.acquire(p.id, body.node_id, c.who);
+    const r = await collab.acquire(p.id, body.node_id, c.who);
     if (!r.ok) return send(res, 409, { error: r.holder ? `${r.holder.label} is editing this card right now.` : r.error, code: 'locked', holder: r.holder });
-    publishCollab(p.id); send(res, 200, collabState(p.id, c.version));
+    publishCollab(p.id); send(res, 200, await collabState(p.id, c.version));
   });
   addRoute('POST', '/api/flows/:id/collab/unlock', async (req, res, url, p) => {
-    const body = await readJson(req); const c = collabContext(req, p.id, body);
-    if (collab.release(p.id, String(body.node_id || ''), c.clientId)) publishCollab(p.id);
-    send(res, 200, collabState(p.id, c.version));
+    const body = await readJson(req); const c = await collabContext(req, p.id, body);
+    if (await collab.release(p.id, String(body.node_id || ''), c.clientId)) publishCollab(p.id);
+    send(res, 200, await collabState(p.id, c.version));
   });
   addRoute('POST', '/api/flows/:id/collab/leave', async (req, res, url, p) => {
-    const body = await readJson(req); const c = collabContext(req, p.id, body);
-    if (collab.leave(p.id, c.clientId)) publishCollab(p.id);
+    const body = await readJson(req); const c = await collabContext(req, p.id, body);
+    if (await collab.leave(p.id, c.clientId)) publishCollab(p.id);
     send(res, 200, { ok: true });
   });
   addRoute('GET', '/api/flows/:id/events', async (req, res, url, p) => {
     if (opts.disableLive) throw new HttpError(404, 'Live updates are not available on this host. The page polls instead.');   // serverless: no long-lived connections
-    const c = collabContext(req, p.id, null);
+    const c = await collabContext(req, p.id, null);
     const conns = hub.get(p.id) || new Set(); hub.set(p.id, conns);
     if (conns.size >= MAX_STREAMS_PER_FLOW) throw new HttpError(429, 'Too many live connections for this flow.');
     let mine = 0; for (const set of hub.values()) for (const k of set) if (k.userId === (c.a.by || c.a.user).id) mine += 1;
@@ -460,12 +460,12 @@ function createServer(opts = {}) {
     res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     const conn = { res, req, clientId: c.clientId, flowId: p.id, userId: (c.a.by || c.a.user).id };
     conns.add(conn);
-    res.write(`retry: 3000\n\nevent: collab\ndata: ${JSON.stringify(collabState(p.id, c.version))}\n\n`);
+    res.write(`retry: 3000\n\nevent: collab\ndata: ${JSON.stringify(await collabState(p.id, c.version))}\n\n`);
     req.on('close', () => { conns.delete(conn); if (!conns.size) hub.delete(p.id); });
   });
   // Every 5 s: expire stale presence, re-check that each stream's owner may still see the flow (freeze, delete, impersonation end), keep-alive.
-  const collabTimer = setInterval(() => {
-    for (const id of collab.sweep()) publishCollab(id);
+  const collabTimer = setInterval(async () => {
+    try { for (const id of await collab.sweep()) publishCollab(id); } catch (e) { /* try again in 5 s */ }
     for (const [flowId, conns] of hub) {
       for (const c of [...conns]) {
         let allowed = false;
@@ -483,7 +483,7 @@ function createServer(opts = {}) {
   addRoute('PATCH', '/api/flows/:id', async (req, res, url, p) => {
     const a = requireAuth(req); const body = await readJson(req);
     const seen = Flows.getFlow(db(), actorOf(a), p.id); if (!seen.ok) return respond(res, seen);   // access first: lock details are for people who can see the flow
-    const locked = lockedNodesFor(p.id, body, a);
+    const locked = await lockedNodesFor(p.id, body, a);
     if (locked.length) return send(res, 423, { error: lockMessage(locked), code: 'locked', locked });
     const r = commit(Flows.saveFlow(db(), actorOf(a), p.id, body));
     if (r.ok && r.version) publishVersion(p.id, a, r.version, r.merged, clientIdOf(body.client_id));
@@ -495,7 +495,7 @@ function createServer(opts = {}) {
   addRoute('GET', '/api/flows/:id/versions/:n', async (req, res, url, p) => respond(res, Flows.getVersion(db(), actorOf(requireAuth(req)), p.id, p.n)));
   addRoute('POST', '/api/flows/:id/versions/:n/restore', async (req, res, url, p) => { const a = requireAuth(req); const body = await readJson(req);
     const seen = Flows.getFlow(db(), actorOf(a), p.id); if (!seen.ok) return respond(res, seen);
-    const others = collab.lockedByOthers(p.id, collab.snapshot(p.id).locks.map(l => l.node_id), clientIdOf(body.client_id), (a.by || a.user).id);
+    const others = await collab.lockedByOthers(p.id, (await collab.snapshot(p.id)).locks.map(l => l.node_id), clientIdOf(body.client_id), (a.by || a.user).id);
     if (others.length) return send(res, 423, { error: lockMessage(others), code: 'locked', locked: others });
     const r = commit(Flows.restoreVersion(db(), actorOf(a), p.id, Number(p.n), body));
     if (r.ok) publishVersion(p.id, a, r.version, false, clientIdOf(body.client_id));

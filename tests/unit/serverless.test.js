@@ -7,13 +7,23 @@ const os = require('node:os');
 const path = require('node:path');
 const { createHandler } = require('../../server/serverless.js');
 
-/** In-memory stand-in for the Supabase table, with PostgREST-like behaviour and a changing updated_at. */
+/** In-memory stand-in for the Supabase table: row "main" (whole db, changing updated_at) and row "live" (shared co-work state, compare-and-swap on data->>v). */
 function fakeRemote() {
-  const state = { row: null, version: 0, gets: 0, posts: 0 };
+  const state = { row: null, version: 0, gets: 0, posts: 0, live: null };
   const fetchImpl = async (url, opts) => {
     const u = new URL(url);
     const reply = (status, body) => ({ ok: status < 300, status, json: async () => body, text: async () => JSON.stringify(body) });
     if (opts.headers.apikey !== 'k') return reply(401, {});
+    const bodyId = opts.body ? JSON.parse(opts.body).id : null;
+    const id = (u.searchParams.get('id') || bodyId || '').replace('eq.', '');
+    if (id === 'live') {
+      if (opts.method === 'GET') return reply(200, state.live ? [{ data: state.live }] : []);
+      const body = JSON.parse(opts.body);
+      if (opts.method === 'POST') { if (!state.live) state.live = body.data; return reply(201, []); }
+      const want = u.searchParams.get('data->>v');
+      if (!state.live || (want && String(state.live.v) !== want.replace('eq.', ''))) return reply(200, []);
+      state.live = body.data; return reply(200, [{ data: state.live }]);
+    }
     if (opts.method === 'GET') {
       state.gets += 1;
       if (!state.row) return reply(200, []);
@@ -22,16 +32,16 @@ function fakeRemote() {
     }
     state.posts += 1; state.version += 1;
     const body = JSON.parse(opts.body);
-    state.row = { data: body.data, updated_at: '2026-11-18T00:00:' + String(state.version).padStart(2, '0') + '.000000+00:00' };
+    state.row = { data: body.data, updated_at: '2026-11-18T00:00:' + String(state.version % 60).padStart(2, '0') + '.' + String(state.version).padStart(6, '0') + '+00:00' };
     return reply(201, [{ updated_at: state.row.updated_at }]);
   };
   return { state, fetchImpl };
 }
 
 /** One "lambda instance": its own handler, own scratch disk, same remote store. */
-async function instance(remote) {
+async function instance(remote, extraEnv) {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'af lambda '));
-  const handler = createHandler({ REMOTE_STORE_URL: 'https://x.supabase.co/rest/v1/agentflow_state', REMOTE_STORE_KEY: 'k', DATA_DIR: dataDir }, remote.fetchImpl);
+  const handler = createHandler({ REMOTE_STORE_URL: 'https://x.supabase.co/rest/v1/agentflow_state', REMOTE_STORE_KEY: 'k', DATA_DIR: dataDir, ...(extraEnv || {}) }, remote.fetchImpl);
   const server = http.createServer((req, res) => { handler(req, res); });
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   const base = 'http://127.0.0.1:' + server.address().port;
@@ -93,18 +103,57 @@ test('reading does not rewrite the remote store', async () => {
   } finally { await a.close(); }
 });
 
-test('live streams are switched off (the page falls back to polling) and runs finish inside the request', async () => {
-  const remote = fakeRemote(); const a = await instance(remote);
+const until = async (fn, ms = 8000) => { const t0 = Date.now(); for (;;) { const v = await fn(); if (v) return v; if (Date.now() - t0 > ms) throw new Error('timed out'); await new Promise(r => setTimeout(r, 40)); } };
+
+test('live streams are switched off (the page falls back to polling) and a run goes on after its answer, visible from another instance', async () => {
+  const remote = fakeRemote(); const a = await instance(remote, { AF_STEP_DELAY_MS: '60' }); let b;
   try {
     const cookie = await login(a, '10.0.4.1');
     assert.equal((await a.call('/api/flows/f_news/events?client=abcdef123', { cookie })).status, 404);
     const run = await a.call('/api/flows/f_news/runs', { method: 'POST', cookie, body: {} });
-    assert.equal(run.status, 202); assert.equal(run.json.run.status, 'success'); assert.ok(run.json.run.credits > 0);
-    const stored = remote.state.row.data.runs.find(r => r.id === run.json.run.id);
-    assert.equal(stored.status, 'success', 'the finished run is stored remotely');
-    const hb = await a.call('/api/flows/f_news/collab/heartbeat', { method: 'POST', cookie, body: { client_id: 'abcdef123' } });
-    assert.equal(hb.status, 200);
-  } finally { await a.close(); }
+    assert.equal(run.status, 202); assert.equal(run.json.run.status, 'running', 'the answer does not wait for the run');
+    b = await instance(remote);
+    const done = await until(async () => { const r = await b.call('/api/runs/' + run.json.run.id, { cookie }); return r.status === 200 && r.json.run.status !== 'running' ? r.json : null; });
+    assert.equal(done.run.status, 'success', String(done.run.error)); assert.ok(done.run.credits > 0); assert.ok(done.steps.length >= 4);
+    assert.equal(remote.state.row.data.runs.find(r => r.id === run.json.run.id).status, 'success');
+  } finally { await a.close(); if (b) await b.close(); }
+});
+
+test('STOP works from another instance: the instance running the flow notices and ends the run', async () => {
+  const remote = fakeRemote(); const a = await instance(remote, { AF_STEP_DELAY_MS: '400' }); let b;
+  try {
+    const cookie = await login(a, '10.0.5.1');
+    const run = await a.call('/api/flows/f_news/runs', { method: 'POST', cookie, body: {} });
+    assert.equal(run.json.run.status, 'running');
+    b = await instance(remote);
+    await new Promise(r => setTimeout(r, 500));
+    const stop = await b.call('/api/runs/' + run.json.run.id + '/stop', { method: 'POST', cookie, body: {} });
+    assert.equal(stop.status, 200);
+    const ended = await until(async () => { const r = await b.call('/api/runs/' + run.json.run.id, { cookie }); return r.json.run.status !== 'running' ? r.json.run : null; }, 10000);
+    assert.notEqual(ended.status, 'success', 'the run was stopped before it finished');
+    assert.ok(ended.steps_count < 5, 'later cards did not run');
+  } finally { await a.close(); if (b) await b.close(); }
+});
+
+test('CO-WORK across instances: a card locked on one instance is locked for the other, and presence is shared', async () => {
+  const remote = fakeRemote(); const a = await instance(remote); const b = await instance(remote);
+  try {
+    const ana = await login(a, '10.0.6.1');
+    const omarRes = await b.call('/api/auth/login', { method: 'POST', body: { email: 'omar@brightloom.test', password: 'AgentFlow#2026' }, ip: '10.0.6.2' });
+    const omar = (omarRes.headers.get('set-cookie') || '').split(';')[0];
+    await a.call('/api/flows/f_news/collab/heartbeat', { method: 'POST', cookie: ana, body: { client_id: 'ana-tab-aaaa' } });
+    assert.equal((await a.call('/api/flows/f_news/collab/lock', { method: 'POST', cookie: ana, body: { client_id: 'ana-tab-aaaa', node_id: 'n2' } })).status, 200);
+    const clash = await b.call('/api/flows/f_news/collab/lock', { method: 'POST', cookie: omar, body: { client_id: 'omar-tab-bbbb', node_id: 'n2' } });
+    assert.equal(clash.status, 409); assert.match(clash.json.error, /Ana Torres is editing/);
+    const hb = await b.call('/api/flows/f_news/collab/heartbeat', { method: 'POST', cookie: omar, body: { client_id: 'omar-tab-bbbb' } });
+    assert.deepEqual(hb.json.presence.map(p => p.name).sort(), ['Ana Torres', 'Omar Siddiqui']);
+    const stolen = await b.call('/api/flows/f_news/collab/heartbeat', { method: 'POST', cookie: omar, body: { client_id: 'ana-tab-aaaa' } });
+    assert.equal(stolen.status, 403, 'a client id is bound to its first user on every instance');
+    const flow = (await b.call('/api/flows/f_news', { cookie: omar })).json.flow;
+    const changed = flow.nodes.map(n => (n.id === 'n2' ? Object.assign({}, n, { label: 'Omar edit' }) : n));
+    const save = await b.call('/api/flows/f_news', { method: 'PATCH', cookie: omar, body: { nodes: changed, edges: flow.edges, base_version: flow.version, client_id: 'omar-tab-bbbb' } });
+    assert.equal(save.status, 423);
+  } finally { await a.close(); await b.close(); }
 });
 
 test('if the remote store cannot be read the handler answers 503 instead of starting empty', async () => {

@@ -4,11 +4,14 @@
  *   - before every request a cheap check compares the row's updated_at with what this instance last saw and reloads if another
  *     instance changed it,
  *   - every change is uploaded BEFORE the answer is sent (write-through), so nothing is lost when the instance is frozen,
- *   - runs finish inside their request (no background work), and live streams are off (the pages poll instead).
- * Known limits (documented in README): two changes at the very same moment on different instances can overwrite each other
- * (last write wins), and presence/locks are per instance. For real use, run the long-lived server (server.js) instead. */
+ *   - a run continues after its answer is sent (Vercel waitUntil keeps the function alive) and uploads its progress every moment,
+ *   - presence, card locks and Stop requests are shared between instances (server/live-sync.js, compare-and-swap),
+ *   - live streams are off (the pages poll every few seconds instead).
+ * Known limit (documented in README): two changes to the SAME flow data at the very same moment on different instances can
+ * overwrite each other (last write wins). For many simultaneous editors, run the long-lived server (server.js) instead. */
 const fs = require('node:fs');
 const path = require('node:path');
+const { SharedCollab } = require('./live-sync.js');
 
 const log = msg => process.stdout.write('[agentflow] ' + msg + '\n');
 
@@ -17,7 +20,8 @@ function createHandler(env = process.env, fetchImpl = fetch) {
   const dataDir = env.DATA_DIR || '/tmp/agentflow-data';
   const file = path.join(dataDir, 'db.json');
   const H = { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' };
-  let server = null; let version = null; let booting = null; let dirtyText = null; let pushChain = Promise.resolve();
+  let server = null; let version = null; let booting = null; let dirtyText = null; let pushChain = Promise.resolve(); let soon = null;
+  const stepDelayMs = Number(env.AF_STEP_DELAY_MS) || 200;
 
   const remote = async (query, init) => {
     const res = await fetchImpl(`${url}${query}`, Object.assign({ headers: H }, init));
@@ -41,12 +45,23 @@ function createHandler(env = process.env, fetchImpl = fetch) {
     return pushChain;
   }
 
+  /** While a run is going on, upload its progress every moment so other instances (and the polling page) can see it. */
+  function pushSoon() { if (soon) return; soon = setTimeout(() => { soon = null; push().catch(e => log('upload failed: ' + e.message)); }, 250); }
+
+  /** Vercel: ask the platform to keep this function alive until `promise` is done (the request context carries waitUntil). */
+  function keepAlive(promise) {
+    const done = promise.then(() => push()).catch(e => log('run follow-up failed: ' + e.message));
+    try { const ctx = globalThis[Symbol.for('@vercel/request-context')]; const wu = ctx && ctx.get && ctx.get() && ctx.get().waitUntil; if (wu) wu(done); } catch (e) { /* not on Vercel: the process stays alive anyway */ }
+  }
+
   async function boot() {
     const row = await readRow('data,updated_at');          // throws if unreadable: never start empty on top of real data
     fs.mkdirSync(dataDir, { recursive: true });
     if (row && row.data) { fs.writeFileSync(file, JSON.stringify(row.data)); version = row.updated_at; }
     const { createServer } = require('../server.js');
-    server = createServer({ dataDir, trustProxy: true, allowFakeGateway: true, inlineRuns: true, disableLive: true, stepDelayMs: 60, saveDebounceMs: 0, afterWrite: t => { dirtyText = t; } });
+    const collab = new SharedCollab({ url, key, fetchImpl });
+    server = createServer({ dataDir, trustProxy: true, allowFakeGateway: true, disableLive: true, stepDelayMs, saveDebounceMs: 0, collab, keepAlive, recoverOlderThanMs: 3 * 60 * 1000,
+      afterWrite: t => { dirtyText = t; if (server && server.runner && server.runner.activeCount() > 0) pushSoon(); } });
     if (!row) await push();                                // first ever start: store the seed
   }
 

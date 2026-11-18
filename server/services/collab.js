@@ -5,6 +5,7 @@
  * and is labelled "Actor (as Subject)". */
 const PRESENCE_MS = 25000;
 const LOCK_MS = 30000;
+const STOP_MS = 10 * 60 * 1000;
 const MAX_LOCKS_PER_CLIENT = 20;
 const COLORS = ['#1D6B57', '#B4501F', '#2B5FAE', '#8A3D9B', '#9A7A00', '#C2335A', '#0E7C86', '#5B6B1F'];
 
@@ -12,7 +13,24 @@ const colorFor = id => { let h = 0; for (const ch of String(id)) h = (h * 31 + c
 const labelOf = w => (w.as_name ? `${w.name} (as ${w.as_name})` : w.name);
 
 class Collab {
-  constructor({ now = Date.now } = {}) { this.now = now; this.presence = new Map(); this.locks = new Map(); this.owners = new Map(); }
+  constructor({ now = Date.now } = {}) { this.now = now; this.presence = new Map(); this.locks = new Map(); this.owners = new Map(); this.stops = new Map(); }
+
+  /** Plain-JSON copy of everything, so several server instances can share it (see server/live-sync.js). */
+  toState() {
+    const obj = m => Object.fromEntries([...m].map(([flow, inner]) => [flow, Object.fromEntries(inner)]));
+    return { presence: obj(this.presence), locks: obj(this.locks), owners: Object.fromEntries(this.owners), stops: Object.fromEntries(this.stops) };
+  }
+
+  loadState(s) {
+    const maps = o => new Map(Object.entries(o || {}).map(([flow, inner]) => [flow, new Map(Object.entries(inner))]));
+    const st = s || {};
+    this.presence = maps(st.presence); this.locks = maps(st.locks);
+    this.owners = new Map(Object.entries(st.owners || {})); this.stops = new Map(Object.entries(st.stops || {}));
+  }
+
+  /** "Stop this run": remembered for a few minutes so the instance that is running the flow can notice it. */
+  requestStop(runId) { this.stops.set(runId, this.now()); }
+  stopRequested(runId) { const t = this.stops.get(runId); return t !== undefined && this.now() - t < STOP_MS; }
 
   /** A client id belongs to the first person who uses it; anyone else sending it is refused (so ids seen in a snapshot cannot be borrowed). */
   claim(clientId, userId) {
@@ -95,6 +113,7 @@ class Collab {
     const out = [];
     for (const id of new Set([...this.presence.keys(), ...this.locks.keys()])) if (this._expire(id)) out.push(id);
     for (const cid of [...this.owners.keys()]) this._forgetUnused(cid);
+    for (const [run, t] of [...this.stops]) if (this.now() - t >= STOP_MS) this.stops.delete(run);
     return out;
   }
 }

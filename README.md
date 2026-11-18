@@ -146,9 +146,13 @@ Vercel runs code only while a request is being answered, so the repository conta
 
 - the whole database is loaded from Supabase and **every change is stored before the answer is sent**, so nothing is lost when Vercel freezes the function;
 - before each request a tiny check reloads the data if another function instance changed it;
-- a Run finishes inside its request (Stop is not useful there), and live streams are replaced by polling every few seconds;
-- two changes at exactly the same moment on different instances can overwrite each other, and presence/lock information is per instance, so co-work
-  is less precise than on the normal server. Use `start-agentflow.bat` or a normal Node host when exact live co-work matters.
+- a **Run continues after its answer** (Vercel `waitUntil`) and uploads its progress every moment; **Stop works from any instance** (the request is stored in
+  the shared live state and the instance running the flow notices it at the next card);
+- **co-work is shared between instances**: presence avatars, card locks, client-id owners and Stop requests live in one Supabase row (`id = 'live'`,
+  see `server/live-sync.js`) and are changed with compare-and-swap, so two people grabbing the same card at the same moment cannot both win;
+- live streams (SSE) are replaced by polling every few seconds, and the function runs in Mumbai (`bom1`) next to the database;
+- remaining limit: two changes to the **same flow data** at exactly the same moment on different instances can overwrite each other (last write wins).
+  For many simultaneous editors run the normal long-lived server (`start-agentflow.bat` or a Node host).
 
 ## Known limits of the prototype
 
